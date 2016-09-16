@@ -175,7 +175,7 @@ h2 {
     padding: 16px 0;
 }
 
-#transportadoras, #estados, #historico {
+#telefones, #chips, #linhas, #historico {
 	display: none;
 }
 
@@ -271,7 +271,6 @@ a.exportar {
 a.exportar:hover {
     background: #5da2F6;
 }
-
 .tituloResultados {
     display: block;
     padding: 0px 2%;
@@ -305,4 +304,15 @@ a.exportar:hover {
 
 div#resultadosEstados, div#resultadosTransp {
     margin-top: 34px;
+}
+
+div.colunaResultado2 {
+    width: 25%;
+    display: inline-block;
+    text-align: center;
+    vertical-align: top;
+}
+
+a.linkTitulo2 {
+    width: 25%;
 }

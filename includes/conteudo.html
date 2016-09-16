@@ -2,6 +2,8 @@
 
 // Arquivo de Corpo
 
+include "../conexao.php";
+
 if(!empty($_POST['hiddenTransp'])){
 ?>
 
@@ -33,13 +35,15 @@ else if(!empty($_POST['hiddenHistorico'])){
 <main>
 	
 <header>
-	<h1>Consultas GFE - PIÁ</h1>
+	<h1>Cadastro Telefones - PIÁ</h1>
 
 	<nav>
-		<a href="#home" class="acao <?php if(empty($_POST['dataInicialTransp']) && empty($_POST['dataInicialEstados'])) echo "selecionado"?>">Home</a>
-		<a href="#transportadoras" class="acao <?php if(!empty($_POST['dataInicialTransp'])) echo "selecionado"?>">Transportadoras</a>
-		<a href="#estados" class="acao <?php if(!empty($_POST['dataInicialEstados'])) echo "selecionado"?>">Estados</a>
+		<a href="#home" class="acao selecionado">Home</a>
+		<a href="#telefones" class="acao">Telefones</a>
+		<a href="#chips" class="acao">Chips</a>
+		<a href="#linhas" class="acao">Linhas</a>
 		<a href="#historico" class="acao">Histórico</a>
+		<a href="../">Relatórios</a>
 		<a href="../logout.php">Logout</a>
 	</nav>
 
@@ -51,255 +55,128 @@ else if(!empty($_POST['hiddenHistorico'])){
 
 
 
-<section id="transportadoras">
-	<h2>Consultar por Transportadoras</h2>
-	<form id="formularioTransportadoras" method="post" action="./">
-		<input type="hidden" name="hiddenTransp" value="true">
-		<label>Data Inicial<input type="date" required value="<?php if(!empty($_POST['dataInicialTransp'])) echo $_POST['dataInicialTransp']; ?>" name="dataInicialTransp"></label>
-		<label>Data Final<input type="date" required value="<?php if(!empty($_POST['dataFinalTransp'])) echo $_POST['dataFinalTransp']; ?>" name="dataFinalTransp"></label>
-		<input type="submit" value="Consultar">
-	</form>
-
-	<?php if(!empty($_POST['dataInicialTransp'])) { 
-
-		$dataInicialTransp = str_replace("-", "", $_POST['dataInicialTransp']);
-		//echo "Data Inicial: ".$dataInicialTransp."<br>";
-		$dataFinalTransp = str_replace("-", "", $_POST['dataFinalTransp']);
-		//echo "Data Final: ".$dataFinalTransp;
-
-	ini_set("soap.wsdl_cache_enabled", "0");
-	ini_set("default_socket_timeout", "120");
-
-	ini_set('display_errors',1);
-	ini_set('display_startup_erros',1);
-	error_reporting(E_ALL);
-	 
-
-	// A seguir você devera informar a URL do webservice.
-	$oSoapClient = new SoapClient("http://lanpiasoa/wsdl/server/readFretesGFEService.wsdl");
-	 
-	$aOptions = array (
-	       "start_debug"=> "1",
-	       "debug_port"=> "10000",
-	       "debug_host"=> "localhost",
-	       "debug_stop"=> "1",
-	       "trace"=> "1");
-	 
-	foreach($aOptions as $key => $val) {
-	        $oSoapClient->__setCookie($key,$val);
-	}
-
-
-	//$resposta = $oSoapClient->readTicketSuporteFuncao("28", "a", "a", "a", "a", "a", "a", 'thiago.santos', 'tpiasl2k16*');
-	$resposta = $oSoapClient->readFretesGFEFuncao($dataInicialTransp, $dataFinalTransp, "transportadoras", 'thiago.santos', 'tpiasl2k16*');	
-		
-	?>
-	<div id="resultadosTransp" ng-app="appTransp" ng-controller="myCtrl">
-	<h2>Resultado da Consulta</h2>
+<section id="telefones" ng-app="appTelefones" ng-controller="myCtrlTelefones">
+	<h2>Lista de Telefones</h2>
 
 	<div class="tituloResultados">
-		<a class="linkTitulo selecionado" ng-click="ordenar('numeroDia');">Dia</a><a  class="linkTitulo" ng-click="ordenar('tipoNota');">Tipo Nota</a><a  class="linkTitulo" ng-click="ordenar('tipoOperacao');">Operação</a><a  class="linkTitulo" ng-click="ordenar('estado');">Estado</a><a  class="linkTitulo" ng-click="ordenar('pesoTotal');">Peso Total</a><a  class="linkTitulo" ng-click="ordenar('faturamento');">Faturamento</a><a  class="linkTitulo" ng-click="ordenar('custoFrete');">Custo Frete</a>
+	<a  class="linkTitulo2 selecionado" ng-click="ordenar2('id');">ID</a><a  class="linkTitulo2" ng-click="ordenar2('marca');">Marca</a><a  class="linkTitulo2" ng-click="ordenar2('modelo');">Modelo</a><a  class="linkTitulo2" ng-click="ordenar2('usuario');">Usuário</a>
 	</div>
 
-	<div class="linhaResultado" ng-repeat="x in records | orderBy:myOrderBy">
-		<div class="colunaResultado">{{x.numeroDia}}</div><div class="colunaResultado">{{x.tipoNota}}</div><div class="colunaResultado">{{x.tipoOperacao}}</div><div class="colunaResultado">{{x.estado}}</div><div class="colunaResultado">{{x.pesoTotal}}</div><div class="colunaResultado">{{x.faturamento}}</div><div class="colunaResultado">{{x.custoFrete}}</div>
+	<div class="linhaResultado {{x.situacao}}" ng-repeat="x in recordsTelefones | orderBy:myOrderBy2">
+		<div class="colunaResultado2">{{x.id}}</div><div class="colunaResultado2">{{x.marca}}</div><div class="colunaResultado2">{{x.modelo}}</div><div class="colunaResultado2">{{x.usuario}}</div>
 	</div>
 
 	<script>
 
 	$(function() {
-		$('.linkTitulo').click(function() {
-			var elementos = document.getElementsByClassName('linkTitulo');
+		$('.linkTitulo2').click(function() {
+			var elementos = document.getElementsByClassName('linkTitulo2');
 
 		for (var x = 0; x < elementos.length; x++) {
-			elementos[x].className = "linkTitulo";
+			elementos[x].className = "linkTitulo2";
 		}
 
-		this.className = "linkTitulo selecionado";
+		this.className = "linkTitulo2 selecionado";
 
 		});
 	});
 
-	var app = angular.module("appTransp", []);
-	app.controller("myCtrl", function($scope) {
+	var app = angular.module("appTelefones", []);
+	app.controller("myCtrlTelefones", function($scope) {
     
-    $scope.records = [
+    $scope.recordsTelefones = [
 
 	<?php
-	if(is_array($resposta)) {
 
-			//echo "Sucesso! Total: ".count($resposta)." Registros";
+	$sql = "SELECT * FROM relatorios_telefones ORDER BY id DESC";
+	$res = mysql_query($sql, $con);
+	$num = mysql_num_rows($res);
 
-		for($i = 0; $i < count($resposta); $i++) {
-
-			if($i == 0) echo "{";
-			else echo ", {";
-
-		$z = 0;
-
-		foreach($resposta[$i] as $x => $x_value) {
-				if($z == 0) {
-	?>'<?php echo $x;?>' : <?php if(is_float($resposta[$i][$x])) echo $resposta[$i][$x]; else  echo "'".$resposta[$i][$x]."'"; ?><?php 
-			}
-
-			else {
-	?>, '<?php echo $x;?>' : <?php if(is_float($resposta[$i][$x])) echo $resposta[$i][$x]; else  echo "'".$resposta[$i][$x]."'"; ?><?php 
-			}
-			$z++;
-
-		}
-
-			echo "}";
-
-		}
-
-}
-
-?>
-
-    ];
-      $scope.ordenar = function(x) {
-	    $scope.myOrderBy = x;
-	  }
-});
-</script>
-
-	<a class="exportar">Exportar Relação Completa para CSV</a>
-
-	</div>
-
-	<?php } ?>
-
-</section>
-
-
-
-<section id="estados">
-	<h2>Consultar por Estados</h2>
-	<form id="formularioEstado" method="post" action="./">
-	<input type="hidden" name="hiddenEstados" value="true">
-	<label>Data Inicial<input type="date" required value="<?php if(!empty($_POST['dataInicialEstados'])) echo $_POST['dataInicialEstados']; ?>" name="dataInicialEstados"></label>
-	<label>Data Final<input type="date" required value="<?php if(!empty($_POST['dataFinalEstados'])) echo $_POST['dataFinalEstados']; ?>" name="dataFinalEstados"></label>
-	<input type="submit" value="Consultar">
-	</form>
-
-	<?php if(!empty($_POST['dataInicialEstados'])) { 
-
-		$dataInicialEstados = str_replace("-", "", $_POST['dataInicialEstados']);
-		//echo "Data Inicial: ".$dataInicialEstados."<br>";
-		$dataFinalEstados = str_replace("-", "", $_POST['dataFinalEstados']);
-		//echo "Data Final: ".$dataFinalEstados;
-
-	ini_set("soap.wsdl_cache_enabled", "0");
-	ini_set("default_socket_timeout", "120");
-
-	ini_set('display_errors',1);
-	ini_set('display_startup_erros',1);
-	error_reporting(E_ALL);
-	 
-
-	// A seguir você devera informar a URL do webservice.
-	$oSoapClient = new SoapClient("http://lanpiasoa/wsdl/server/readFretesGFEService.wsdl");
-	 
-	$aOptions = array (
-	       "start_debug"=> "1",
-	       "debug_port"=> "10000",
-	       "debug_host"=> "localhost",
-	       "debug_stop"=> "1",
-	       "trace"=> "1");
-	 
-	foreach($aOptions as $key => $val) {
-	        $oSoapClient->__setCookie($key,$val);
+	for($i = 0; $i < $num; $i++) {
+	$row = mysql_fetch_array($res);
+		if($i == 0) echo "{";
+		else echo ", {";
+		echo "'id': ".$row['id'].", 'marca': '".$row['marca']."', 'modelo': '".$row['modelo']."', 'situacao': '".$row['situacao']."', 'usuario': '".$row['usuario']."' }";
 	}
-
-
-	//$resposta = $oSoapClient->readTicketSuporteFuncao("28", "a", "a", "a", "a", "a", "a", 'thiago.santos', 'tpiasl2k16*');
-	$resposta = $oSoapClient->readFretesGFEFuncao($dataInicialEstados, $dataFinalEstados, "estados", 'thiago.santos', 'tpiasl2k16*');	
-		
+	
 	?>
-	<div id="resultadosEstados" ng-app="appTransp" ng-controller="myCtrl">
-	<h2>Resultado da Consulta</h2>
-
-	<div class="tituloResultados">
-		<a class="linkTitulo selecionado" ng-click="ordenar('numeroDia');">Dia</a><a  class="linkTitulo" ng-click="ordenar('tipoNota');">Tipo Nota</a><a  class="linkTitulo" ng-click="ordenar('tipoOperacao');">Operação</a><a  class="linkTitulo" ng-click="ordenar('estado');">Estado</a><a  class="linkTitulo" ng-click="ordenar('pesoTotal');">Peso Total</a><a  class="linkTitulo" ng-click="ordenar('faturamento');">Faturamento</a><a  class="linkTitulo" ng-click="ordenar('custoFrete');">Custo Frete</a>
-	</div>
-
-	<div class="linhaResultado" ng-repeat="x in records | orderBy:myOrderBy">
-		<div class="colunaResultado">{{x.numeroDia}}</div><div class="colunaResultado">{{x.tipoNota}}</div><div class="colunaResultado">{{x.tipoOperacao}}</div><div class="colunaResultado">{{x.estado}}</div><div class="colunaResultado">{{x.pesoTotal}}</div><div class="colunaResultado">{{x.faturamento}}</div><div class="colunaResultado">{{x.custoFrete}}</div>
-	</div>
-
-	<script>
-
-	$(function() {
-		$('.linkTitulo').click(function() {
-			var elementos = document.getElementsByClassName('linkTitulo');
-
-		for (var x = 0; x < elementos.length; x++) {
-			elementos[x].className = "linkTitulo";
-		}
-
-		this.className = "linkTitulo selecionado";
-
-		});
-	});
-
-	var app = angular.module("appTransp", []);
-	app.controller("myCtrl", function($scope) {
-    
-    $scope.records = [
-
-	<?php
-	if(is_array($resposta)) {
-
-			//echo "Sucesso! Total: ".count($resposta)." Registros";
-
-		for($i = 0; $i < count($resposta); $i++) {
-
-			if($i == 0) echo "{";
-			else echo ", {";
-
-		$z = 0;
-
-		foreach($resposta[$i] as $x => $x_value) {
-				if($z == 0) {
-	?>'<?php echo $x;?>' : <?php if(is_float($resposta[$i][$x])) echo $resposta[$i][$x]; else  echo "'".$resposta[$i][$x]."'"; ?><?php 
-			}
-
-			else {
-	?>, '<?php echo $x;?>' : <?php if(is_float($resposta[$i][$x])) echo $resposta[$i][$x]; else  echo "'".$resposta[$i][$x]."'"; ?><?php 
-			}
-			$z++;
-
-		}
-
-			echo "}";
-
-		}
-
-}
-
-?>
 
     ];
-      $scope.ordenar = function(x) {
-	    $scope.myOrderBy = x;
+      $scope.ordenar2 = function(x) {
+	    $scope.myOrderBy2 = x;
 	  }
 });
 </script>
-
-	<a class="exportar">Exportar Relação Completa para CSV</a>
-
-	</div>
-
-	<?php } ?>
-
 
 </section>
 
 
 
-<section id="historico">
+<section id="chips">
+	<h2>Lista de Chips</h2>
+</section>
+
+
+
+<section id="linhas">
+	<h2>Lista de Linhas</h2>
+</section>
+
+
+
+<section id="historico" ng-app="appHistorico" ng-controller="myCtrlHistorico">
 	<h2>Consultar Histórico</h2>
+
+	<div class="tituloResultados">
+		<a class="linkTitulo2 selecionado" ng-click="ordenar2('diaHora');">Dia e Hora</a><a  class="linkTitulo2" ng-click="ordenar2('evento');">Evento</a><a  class="linkTitulo2" ng-click="ordenar2('descricao');">Descrição</a><a  class="linkTitulo2" ng-click="ordenar2('usuario');">Usuário</a>
+	</div>
+
+	<div class="linhaResultado" ng-repeat="x in records | orderBy:myOrderBy2">
+		<div class="colunaResultado2">{{x.diaHora}}</div><div class="colunaResultado2">{{x.evento}}</div><div class="colunaResultado2">{{x.descricao}}</div><div class="colunaResultado2">{{x.usuario}}</div>
+	</div>
+
+	<script>
+
+	$(function() {
+		$('.linkTitulo2').click(function() {
+			var elementos = document.getElementsByClassName('linkTitulo2');
+
+		for (var x = 0; x < elementos.length; x++) {
+			elementos[x].className = "linkTitulo2";
+		}
+
+		this.className = "linkTitulo2 selecionado";
+
+		});
+	});
+
+	var app = angular.module("appHistorico", []);
+	app.controller("myCtrlHistorico", function($scope) {
+    
+    $scope.records = [
+
+	<?php
+
+	$sql = "SELECT relatorios_historico.id, relatorios_historico.nome, hora, descricao, relatorios_usuarios.nome AS usuario FROM relatorios_historico LEFT JOIN relatorios_usuarios ON relatorios_historico.id_usuario = relatorios_usuarios.id  WHERE sistema = 2 OR sistema = 0 ORDER BY relatorios_historico.id DESC";
+	$res = mysql_query($sql, $con);
+	$num = mysql_num_rows($res);
+
+	for($i = 0; $i < $num; $i++) {
+	$row = mysql_fetch_array($res);
+		if($i == 0) echo "{";
+		else echo ", {";
+		echo "'diaHora': '".$row['hora']."', 'evento': '".$row['nome']."', 'descricao': '".$row['descricao']."', 'usuario': '".$row['usuario']."' }";
+	}
+	
+	?>
+
+    ];
+      $scope.ordenar2 = function(x) {
+	    $scope.myOrderBy2 = x;
+	  }
+});
+</script>
+
 </section>
 
 </main>
