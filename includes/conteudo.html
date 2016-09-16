@@ -1,0 +1,307 @@
+<?php
+
+// Arquivo de Corpo
+
+if(!empty($_POST['hiddenTransp'])){
+?>
+
+<style> #home {	display: none;} #transportadoras { display: block;} </style>
+
+<?php	
+}
+
+else if(!empty($_POST['hiddenEstados'])){
+?>
+
+<style> #home {	display: none;} #estados { display: block;} </style>
+
+<?php		
+}
+
+else if(!empty($_POST['hiddenHistorico'])){
+?>
+
+<style> #home {	display: none;} #historico { display: block;} </style>
+
+<?php		
+}
+
+?>
+
+<body>
+
+<main>
+	
+<header>
+	<h1>Consultas GFE - PIÁ</h1>
+
+	<nav>
+		<a href="#home" class="acao <?php if(empty($_POST['dataInicialTransp']) && empty($_POST['dataInicialEstados'])) echo "selecionado"?>">Home</a>
+		<a href="#transportadoras" class="acao <?php if(!empty($_POST['dataInicialTransp'])) echo "selecionado"?>">Transportadoras</a>
+		<a href="#estados" class="acao <?php if(!empty($_POST['dataInicialEstados'])) echo "selecionado"?>">Estados</a>
+		<a href="#historico" class="acao">Histórico</a>
+		<a href="../logout.php">Logout</a>
+	</nav>
+
+</header>
+
+<section id="home">
+	<p>Olá, <strong>Thiago Santos</strong>. Use o Menu Superior para Navegar.</p>
+</section>
+
+
+
+<section id="transportadoras">
+	<h2>Consultar por Transportadoras</h2>
+	<form id="formularioTransportadoras" method="post" action="./">
+		<input type="hidden" name="hiddenTransp" value="true">
+		<label>Data Inicial<input type="date" required value="<?php if(!empty($_POST['dataInicialTransp'])) echo $_POST['dataInicialTransp']; ?>" name="dataInicialTransp"></label>
+		<label>Data Final<input type="date" required value="<?php if(!empty($_POST['dataFinalTransp'])) echo $_POST['dataFinalTransp']; ?>" name="dataFinalTransp"></label>
+		<input type="submit" value="Consultar">
+	</form>
+
+	<?php if(!empty($_POST['dataInicialTransp'])) { 
+
+		$dataInicialTransp = str_replace("-", "", $_POST['dataInicialTransp']);
+		//echo "Data Inicial: ".$dataInicialTransp."<br>";
+		$dataFinalTransp = str_replace("-", "", $_POST['dataFinalTransp']);
+		//echo "Data Final: ".$dataFinalTransp;
+
+	ini_set("soap.wsdl_cache_enabled", "0");
+	ini_set("default_socket_timeout", "120");
+
+	ini_set('display_errors',1);
+	ini_set('display_startup_erros',1);
+	error_reporting(E_ALL);
+	 
+
+	// A seguir você devera informar a URL do webservice.
+	$oSoapClient = new SoapClient("http://lanpiasoa/wsdl/server/readFretesGFEService.wsdl");
+	 
+	$aOptions = array (
+	       "start_debug"=> "1",
+	       "debug_port"=> "10000",
+	       "debug_host"=> "localhost",
+	       "debug_stop"=> "1",
+	       "trace"=> "1");
+	 
+	foreach($aOptions as $key => $val) {
+	        $oSoapClient->__setCookie($key,$val);
+	}
+
+
+	//$resposta = $oSoapClient->readTicketSuporteFuncao("28", "a", "a", "a", "a", "a", "a", 'thiago.santos', 'tpiasl2k16*');
+	$resposta = $oSoapClient->readFretesGFEFuncao($dataInicialTransp, $dataFinalTransp, "transportadoras", 'thiago.santos', 'tpiasl2k16*');	
+		
+	?>
+	<div id="resultadosTransp" ng-app="appTransp" ng-controller="myCtrl">
+	<h2>Resultado da Consulta</h2>
+
+	<div class="tituloResultados">
+		<a class="linkTitulo selecionado" ng-click="ordenar('numeroDia');">Dia</a><a  class="linkTitulo" ng-click="ordenar('tipoNota');">Tipo Nota</a><a  class="linkTitulo" ng-click="ordenar('tipoOperacao');">Operação</a><a  class="linkTitulo" ng-click="ordenar('estado');">Estado</a><a  class="linkTitulo" ng-click="ordenar('pesoTotal');">Peso Total</a><a  class="linkTitulo" ng-click="ordenar('faturamento');">Faturamento</a><a  class="linkTitulo" ng-click="ordenar('custoFrete');">Custo Frete</a>
+	</div>
+
+	<div class="linhaResultado" ng-repeat="x in records | orderBy:myOrderBy">
+		<div class="colunaResultado">{{x.numeroDia}}</div><div class="colunaResultado">{{x.tipoNota}}</div><div class="colunaResultado">{{x.tipoOperacao}}</div><div class="colunaResultado">{{x.estado}}</div><div class="colunaResultado">{{x.pesoTotal}}</div><div class="colunaResultado">{{x.faturamento}}</div><div class="colunaResultado">{{x.custoFrete}}</div>
+	</div>
+
+	<script>
+
+	$(function() {
+		$('.linkTitulo').click(function() {
+			var elementos = document.getElementsByClassName('linkTitulo');
+
+		for (var x = 0; x < elementos.length; x++) {
+			elementos[x].className = "linkTitulo";
+		}
+
+		this.className = "linkTitulo selecionado";
+
+		});
+	});
+
+	var app = angular.module("appTransp", []);
+	app.controller("myCtrl", function($scope) {
+    
+    $scope.records = [
+
+	<?php
+	if(is_array($resposta)) {
+
+			//echo "Sucesso! Total: ".count($resposta)." Registros";
+
+		for($i = 0; $i < count($resposta); $i++) {
+
+			if($i == 0) echo "{";
+			else echo ", {";
+
+		$z = 0;
+
+		foreach($resposta[$i] as $x => $x_value) {
+				if($z == 0) {
+	?>'<?php echo $x;?>' : <?php if(is_float($resposta[$i][$x])) echo $resposta[$i][$x]; else  echo "'".$resposta[$i][$x]."'"; ?><?php 
+			}
+
+			else {
+	?>, '<?php echo $x;?>' : <?php if(is_float($resposta[$i][$x])) echo $resposta[$i][$x]; else  echo "'".$resposta[$i][$x]."'"; ?><?php 
+			}
+			$z++;
+
+		}
+
+			echo "}";
+
+		}
+
+}
+
+?>
+
+    ];
+      $scope.ordenar = function(x) {
+	    $scope.myOrderBy = x;
+	  }
+});
+</script>
+
+	<a class="exportar">Exportar Relação Completa para CSV</a>
+
+	</div>
+
+	<?php } ?>
+
+</section>
+
+
+
+<section id="estados">
+	<h2>Consultar por Estados</h2>
+	<form id="formularioEstado" method="post" action="./">
+	<input type="hidden" name="hiddenEstados" value="true">
+	<label>Data Inicial<input type="date" required value="<?php if(!empty($_POST['dataInicialEstados'])) echo $_POST['dataInicialEstados']; ?>" name="dataInicialEstados"></label>
+	<label>Data Final<input type="date" required value="<?php if(!empty($_POST['dataFinalEstados'])) echo $_POST['dataFinalEstados']; ?>" name="dataFinalEstados"></label>
+	<input type="submit" value="Consultar">
+	</form>
+
+	<?php if(!empty($_POST['dataInicialEstados'])) { 
+
+		$dataInicialEstados = str_replace("-", "", $_POST['dataInicialEstados']);
+		//echo "Data Inicial: ".$dataInicialEstados."<br>";
+		$dataFinalEstados = str_replace("-", "", $_POST['dataFinalEstados']);
+		//echo "Data Final: ".$dataFinalEstados;
+
+	ini_set("soap.wsdl_cache_enabled", "0");
+	ini_set("default_socket_timeout", "120");
+
+	ini_set('display_errors',1);
+	ini_set('display_startup_erros',1);
+	error_reporting(E_ALL);
+	 
+
+	// A seguir você devera informar a URL do webservice.
+	$oSoapClient = new SoapClient("http://lanpiasoa/wsdl/server/readFretesGFEService.wsdl");
+	 
+	$aOptions = array (
+	       "start_debug"=> "1",
+	       "debug_port"=> "10000",
+	       "debug_host"=> "localhost",
+	       "debug_stop"=> "1",
+	       "trace"=> "1");
+	 
+	foreach($aOptions as $key => $val) {
+	        $oSoapClient->__setCookie($key,$val);
+	}
+
+
+	//$resposta = $oSoapClient->readTicketSuporteFuncao("28", "a", "a", "a", "a", "a", "a", 'thiago.santos', 'tpiasl2k16*');
+	$resposta = $oSoapClient->readFretesGFEFuncao($dataInicialEstados, $dataFinalEstados, "estados", 'thiago.santos', 'tpiasl2k16*');	
+		
+	?>
+	<div id="resultadosEstados" ng-app="appTransp" ng-controller="myCtrl">
+	<h2>Resultado da Consulta</h2>
+
+	<div class="tituloResultados">
+		<a class="linkTitulo selecionado" ng-click="ordenar('numeroDia');">Dia</a><a  class="linkTitulo" ng-click="ordenar('tipoNota');">Tipo Nota</a><a  class="linkTitulo" ng-click="ordenar('tipoOperacao');">Operação</a><a  class="linkTitulo" ng-click="ordenar('estado');">Estado</a><a  class="linkTitulo" ng-click="ordenar('pesoTotal');">Peso Total</a><a  class="linkTitulo" ng-click="ordenar('faturamento');">Faturamento</a><a  class="linkTitulo" ng-click="ordenar('custoFrete');">Custo Frete</a>
+	</div>
+
+	<div class="linhaResultado" ng-repeat="x in records | orderBy:myOrderBy">
+		<div class="colunaResultado">{{x.numeroDia}}</div><div class="colunaResultado">{{x.tipoNota}}</div><div class="colunaResultado">{{x.tipoOperacao}}</div><div class="colunaResultado">{{x.estado}}</div><div class="colunaResultado">{{x.pesoTotal}}</div><div class="colunaResultado">{{x.faturamento}}</div><div class="colunaResultado">{{x.custoFrete}}</div>
+	</div>
+
+	<script>
+
+	$(function() {
+		$('.linkTitulo').click(function() {
+			var elementos = document.getElementsByClassName('linkTitulo');
+
+		for (var x = 0; x < elementos.length; x++) {
+			elementos[x].className = "linkTitulo";
+		}
+
+		this.className = "linkTitulo selecionado";
+
+		});
+	});
+
+	var app = angular.module("appTransp", []);
+	app.controller("myCtrl", function($scope) {
+    
+    $scope.records = [
+
+	<?php
+	if(is_array($resposta)) {
+
+			//echo "Sucesso! Total: ".count($resposta)." Registros";
+
+		for($i = 0; $i < count($resposta); $i++) {
+
+			if($i == 0) echo "{";
+			else echo ", {";
+
+		$z = 0;
+
+		foreach($resposta[$i] as $x => $x_value) {
+				if($z == 0) {
+	?>'<?php echo $x;?>' : <?php if(is_float($resposta[$i][$x])) echo $resposta[$i][$x]; else  echo "'".$resposta[$i][$x]."'"; ?><?php 
+			}
+
+			else {
+	?>, '<?php echo $x;?>' : <?php if(is_float($resposta[$i][$x])) echo $resposta[$i][$x]; else  echo "'".$resposta[$i][$x]."'"; ?><?php 
+			}
+			$z++;
+
+		}
+
+			echo "}";
+
+		}
+
+}
+
+?>
+
+    ];
+      $scope.ordenar = function(x) {
+	    $scope.myOrderBy = x;
+	  }
+});
+</script>
+
+	<a class="exportar">Exportar Relação Completa para CSV</a>
+
+	</div>
+
+	<?php } ?>
+
+
+</section>
+
+
+
+<section id="historico">
+	<h2>Consultar Histórico</h2>
+</section>
+
+</main>
+
+</body>
