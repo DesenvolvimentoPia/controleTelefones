@@ -8,7 +8,22 @@ if(!empty($_POST['hiddenAparelho'])) {
 	$sql = "UPDATE relatorios_telefones SET marca = '".$_POST['inputMarca']."', modelo = '".$_POST['inputModelo']."', imei = '".$_POST['inputImei']."', pin = '".$_POST['inputPin']."', situacao = '".$_POST['inputSituacao']."', problema = '".$_POST['inputProblema']."', usuario = '".$_POST['inputUsuario']."', matricula = '".$_POST['inputMatriculaUsuario']."', setor = '".$_POST['inputSetor']."', unidade = '".$_POST['inputUnidade']."' WHERE id=".$_POST['hiddenAparelho'];
 	$res = mysql_query($sql, $con);
 
+	$sql1 = "INSERT INTO relatorios_historico VALUES ('', 'Item Editado', '".date("Y-m-d H:i:s")."', 'O Item ".$_POST['hiddenAparelho']." foi Editado com Sucesso.', '".$_SESSION['userId']."', '2')";
+	$res1= mysql_query($sql1, $con);
+
+	//echo "AQUI: ".$sql1;
+
 	$resultado = "Aparelho Alterado com Sucesso!";
+}
+
+if(!empty($_POST['hiddenNovoAparelho'])) {
+	$sql = "INSERT INTO relatorios_telefones VALUES ('', '".$_POST['inputMarca']."', '".$_POST['inputModelo']."', '".$_POST['inputImei']."', '".$_POST['inputPin']."', '".$_POST['inputSituacao']."', '".$_POST['inputProblema']."', '".$_POST['inputUsuario']."', '".$_POST['inputSetor']."', '".$_POST['inputUnidade']."', '".$_POST['inputMatriculaUsuario']."')";
+	$res = mysql_query($sql, $con);
+
+	$sql1 = "INSERT INTO relatorios_historico VALUES ('', 'Item Adicionado', '".date("Y-m-d H:i:s")."', 'Um Novo Item foi Adicionado com Sucesso.', '".$_SESSION['userId']."', '2')";
+	$res1= mysql_query($sql1, $con);
+
+	$resultado = "Aparelho Inserido com Sucesso!";
 }
 
 if(!empty($_POST['hiddenTransp'])){
@@ -60,7 +75,7 @@ $(function(){
 <main>
 	
 <header>
-	<h1>Cadastro Telefones - PIÁ</h1>
+	<h1><img src="../img/logo2.png" id="logoInterno"> Cadastro Telefones - PIÁ</h1>
 
 	<nav>
 		<a href="#home" class="acao selecionado">Home</a>

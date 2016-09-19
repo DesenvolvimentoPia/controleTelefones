@@ -454,6 +454,42 @@ a#adicionarAparelho {
     -webkit-transition: all 0.43s;
 }
 
-a#adicionarAparelho:hover {
+a#adicionarAparelho:hover, a#botaoVoltar:hover {
     background: #578fce;
+}
+
+a#botaoVoltar {
+    width: 30%;
+    text-align: center;
+    display: block;
+    margin: 0px 0 0 63%;
+    cursor: pointer;
+    transition: all 0.43s;
+    -o-transition: all 0.43s;
+    -moz-transition: all 0.43s;
+    -webkit-transition: all 0.43s;
+    color: #FFF;
+    font-size: 18px;
+    padding: 18px 1%;
+    background: #999;
+}
+
+input:required {
+    border: #79C solid 1px;
+}
+
+form span {
+    margin-left: 86%;
+    margin-top: -44px;
+    display: block;
+    margin-bottom: 25px;
+    font-size: 18px;
+    color: #79C;
+}
+
+
+img#logoInterno {
+    width: 20%;
+    vertical-align: middle;
+    margin: 0 13% 0 -33%;
 }
