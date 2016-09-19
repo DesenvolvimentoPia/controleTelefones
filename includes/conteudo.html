@@ -4,6 +4,13 @@
 
 include "../conexao.php";
 
+if(!empty($_POST['hiddenAparelho'])) {
+	$sql = "UPDATE relatorios_telefones SET marca = '".$_POST['inputMarca']."', modelo = '".$_POST['inputModelo']."', imei = '".$_POST['inputImei']."', pin = '".$_POST['inputPin']."', situacao = '".$_POST['inputSituacao']."', problema = '".$_POST['inputProblema']."', usuario = '".$_POST['inputUsuario']."', matricula = '".$_POST['inputMatriculaUsuario']."', setor = '".$_POST['inputSetor']."', unidade = '".$_POST['inputUnidade']."' WHERE id=".$_POST['hiddenAparelho'];
+	$res = mysql_query($sql, $con);
+
+	$resultado = "Aparelho Alterado com Sucesso!";
+}
+
 if(!empty($_POST['hiddenTransp'])){
 ?>
 
@@ -32,6 +39,24 @@ else if(!empty($_POST['hiddenHistorico'])){
 
 <body>
 
+<?php if(isset($resultado)) { ?>
+
+<script>
+
+$(function(){
+	$("#sombra").click(function(){
+		$("#sombra").fadeOut();
+		$("#resultadoSql").fadeOut();
+	});
+});
+
+</script>
+
+<div id="sombra"></div>
+
+<div id="resultadoSql"><?=$resultado;?></div>
+<?php } ?>
+
 <main>
 	
 <header>
@@ -42,6 +67,7 @@ else if(!empty($_POST['hiddenHistorico'])){
 		<a href="#telefones" class="acao">Telefones</a>
 		<a href="#chips" class="acao">Chips</a>
 		<a href="#linhas" class="acao">Linhas</a>
+		<a href="#modens" class="acao">Modens</a>
 		<a href="#historico" class="acao">Histórico</a>
 		<a href="../">Relatórios</a>
 		<a href="../logout.php">Logout</a>
@@ -58,25 +84,27 @@ else if(!empty($_POST['hiddenHistorico'])){
 <section id="telefones" ng-app="appTelefones" ng-controller="myCtrlTelefones">
 	<h2>Lista de Telefones</h2>
 
+	<input placeholder="Pesquisa Rápida" name="pesquisarAparelhos" id="pesquisarAparelhos" type="text" ng-model="filtro"><a id="adicionarAparelho">Adicionar</a>
+
 	<div class="tituloResultados">
-	<a  class="linkTitulo2 selecionado" ng-click="ordenar2('id');">ID</a><a  class="linkTitulo2" ng-click="ordenar2('marca');">Marca</a><a  class="linkTitulo2" ng-click="ordenar2('modelo');">Modelo</a><a  class="linkTitulo2" ng-click="ordenar2('usuario');">Usuário</a>
+	<a  class="linkTitulo selecionado" ng-click="ordenar('id');">ID</a><a  class="linkTitulo" ng-click="ordenar('marca');">Marca</a><a  class="linkTitulo" ng-click="ordenar('modelo');">Modelo</a><a  class="linkTitulo" ng-click="ordenar('usuario');">Usuário</a><a  class="linkTitulo" ng-click="ordenar('imei');">IMEI</a><a  class="linkTitulo" ng-click="ordenar('setor');">Setor</a><a  class="linkTitulo" ng-click="ordenar('unidade');">Unidade</a>
 	</div>
 
-	<div class="linhaResultado {{x.situacao}}" ng-repeat="x in recordsTelefones | orderBy:myOrderBy2">
-		<div class="colunaResultado2">{{x.id}}</div><div class="colunaResultado2">{{x.marca}}</div><div class="colunaResultado2">{{x.modelo}}</div><div class="colunaResultado2">{{x.usuario}}</div>
-	</div>
+	<a data-cod="{{x.id}}" class="linhaResultado {{x.situacao}}" title="{{x.situacao}} {{x.problema}}" ng-repeat="x in recordsTelefones | orderBy:myOrderBy | filter: filtro">
+		<div class="colunaResultado">{{x.id}}</div><div class="colunaResultado">{{x.marca}}</div><div class="colunaResultado">{{x.modelo}}</div><div class="colunaResultado">{{x.usuario}}</div><div class="colunaResultado">{{x.imei}}</div><div class="colunaResultado">{{x.setor}}</div><div class="colunaResultado">{{x.unidade}}</div>
+	</a>
 
 	<script>
 
 	$(function() {
-		$('.linkTitulo2').click(function() {
-			var elementos = document.getElementsByClassName('linkTitulo2');
+		$('.linkTitulo').click(function() {
+			var elementos = document.getElementsByClassName('linkTitulo');
 
 		for (var x = 0; x < elementos.length; x++) {
-			elementos[x].className = "linkTitulo2";
+			elementos[x].className = "linkTitulo";
 		}
 
-		this.className = "linkTitulo2 selecionado";
+		this.className = "linkTitulo selecionado";
 
 		});
 	});
@@ -96,16 +124,46 @@ else if(!empty($_POST['hiddenHistorico'])){
 	$row = mysql_fetch_array($res);
 		if($i == 0) echo "{";
 		else echo ", {";
-		echo "'id': ".$row['id'].", 'marca': '".$row['marca']."', 'modelo': '".$row['modelo']."', 'situacao': '".$row['situacao']."', 'usuario': '".$row['usuario']."' }";
+		echo "'id': ".$row['id'].", 'marca': '".$row['marca']."', 'modelo': '".$row['modelo']."', 'situacao': '".$row['situacao']."', 'usuario': '".$row['usuario']."', 'imei': '".$row['imei']."', 'setor': '".$row['setor']."', 'unidade': '".$row['unidade']."', 'problema': '".$row['problema']."' }";
 	}
 	
 	?>
 
     ];
-      $scope.ordenar2 = function(x) {
-	    $scope.myOrderBy2 = x;
+      $scope.ordenar = function(x) {
+	    $scope.myOrderBy = x;
 	  }
+
 });
+
+
+$(function () {
+	$('.linhaResultado').click(function() {
+	    var id = $(this).data('cod');
+	    //alert("AQUI: "+id);
+		$('#telefones').html('Carregando...');
+		// Do an ajax request
+		$.ajax({
+		  url: "aparelho.php?id="+id
+		}).done(function(data) { // data what is sent back by the php page
+		  $('#telefones').html(data); // display data
+		});
+
+	});
+
+	$('#adicionarAparelho').click(function() {
+
+		$('#telefones').html('Carregando...');
+		// Do an ajax request
+		$.ajax({
+		  url: "aparelho.php?id=novo"
+		}).done(function(data) { // data what is sent back by the php page
+		  $('#telefones').html(data); // display data
+		});
+
+	});
+});
+	
 </script>
 
 </section>
@@ -124,6 +182,12 @@ else if(!empty($_POST['hiddenHistorico'])){
 
 
 
+<section id="modens">
+	<h2>Lista de Modens</h2>
+</section>
+
+
+
 <section id="historico" ng-app="appHistorico" ng-controller="myCtrlHistorico">
 	<h2>Consultar Histórico</h2>
 
@@ -131,8 +195,8 @@ else if(!empty($_POST['hiddenHistorico'])){
 		<a class="linkTitulo2 selecionado" ng-click="ordenar2('diaHora');">Dia e Hora</a><a  class="linkTitulo2" ng-click="ordenar2('evento');">Evento</a><a  class="linkTitulo2" ng-click="ordenar2('descricao');">Descrição</a><a  class="linkTitulo2" ng-click="ordenar2('usuario');">Usuário</a>
 	</div>
 
-	<div class="linhaResultado" ng-repeat="x in records | orderBy:myOrderBy2">
-		<div class="colunaResultado2">{{x.diaHora}}</div><div class="colunaResultado2">{{x.evento}}</div><div class="colunaResultado2">{{x.descricao}}</div><div class="colunaResultado2">{{x.usuario}}</div>
+	<div class="linhaResultado" ng-repeat="y in records | orderBy:myOrderBy2">
+		<div class="colunaResultado2">{{y.diaHora}}</div><div class="colunaResultado2">{{y.evento}}</div><div class="colunaResultado2">{{y.descricao}}</div><div class="colunaResultado2">{{y.usuario}}</div>
 	</div>
 
 	<script>
@@ -150,8 +214,8 @@ else if(!empty($_POST['hiddenHistorico'])){
 		});
 	});
 
-	var app = angular.module("appHistorico", []);
-	app.controller("myCtrlHistorico", function($scope) {
+	var appHistorico = angular.module("appHistorico", [])
+	.controller("myCtrlHistorico", function($scope) {
     
     $scope.records = [
 
@@ -171,10 +235,13 @@ else if(!empty($_POST['hiddenHistorico'])){
 	?>
 
     ];
-      $scope.ordenar2 = function(x) {
-	    $scope.myOrderBy2 = x;
+      $scope.ordenar2 = function(y) {
+	    $scope.myOrderBy2 = y;
 	  }
 });
+
+angular.bootstrap('#historico', ['appHistorico']);
+
 </script>
 
 </section>

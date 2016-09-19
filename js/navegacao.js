@@ -13,6 +13,7 @@ $(document).ready(function() {
 		var exibir = this.href.split('#'); // Recebe a Página para Navegação
 
 		$('section').hide(); // Esconde Páginas
+		$('#aparelho').fadeIn(700); // Exibe Página Selecionada
 		$('#'+exibir[1]).fadeIn(700); // Exibe Página Selecionada
 	});
 });
