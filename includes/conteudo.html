@@ -218,7 +218,7 @@ $(function(){
 
 
 $(function () {
-	$('.linhaResultado').click(function() {
+	$( "section" ).delegate( ".linhaResultado", "click", function() {
 	    var id = $(this).data('cod');
 	    //alert("AQUI: "+id);
 		$('#telefones').html('Carregando...');
@@ -314,7 +314,7 @@ $(function () {
 
 
 $(function () {
-	$('.linhaResultado4').click(function() {
+	$( "section" ).delegate( ".linhaResultado4", "click", function() {
 	    var id = $(this).data('cod');
 	    //alert("AQUI: "+id);
 		$('#linhas').html('Carregando...');
@@ -411,7 +411,7 @@ angular.bootstrap('#linhas', ['appLinhas']);
 
 
 $(function () {
-	$('.linhaResultado3').click(function() {
+	$( "section" ).delegate( ".linhaResultado3", "click", function() {
 	    var id = $(this).data('cod');
 	    //alert("AQUI: "+id);
 		$('#modens').html('Carregando...');
