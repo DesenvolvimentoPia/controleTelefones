@@ -29,6 +29,21 @@ $rowAparelho = mysql_fetch_array($resAparelho);
 	<input value="<?=$rowAparelho['setor']?>" placeholder="Setor" type="text" name="inputSetor" id="inputSetor">
 	<input value="<?=$rowAparelho['unidade']?>" placeholder="Unidade" type="text" name="inputUnidade" id="inputUnidade">
 
+	<select name="inputChip" id="inputChip">
+		<option value="0" selected>Sem Chip</option>
+		<?php
+		$sqlChip = "SELECT * FROM relatorios_chips ORDER BY id";
+		$resChip = mysql_query($sqlChip, $con);
+		$numChip = mysql_num_rows($resChip);
+
+		for($x = 0; $x < $numChip; $x++) {
+
+			$rowChip = mysql_fetch_array($resChip);
+		?>		
+		<option <?php if($rowAparelho['id_chip'] == $rowChip['id']) echo "selected"; ?> value="<?=$rowChip['id']?>"><?="Chip ".$rowChip['id']." - ".$rowChip['numero']?></option>
+		<?php } ?>
+	</select>
+
 	<textarea placeholder="Problema" type="text" name="inputProblema" id="inputProblema"><?=$rowAparelho['problema']?></textarea>
 
 	<input type="submit" name="enviar" value="Salvar">

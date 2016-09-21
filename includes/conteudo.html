@@ -7,8 +7,42 @@ include "../conexao.php";
 
 
 
+/* Trecho Responsável pela edição de um Chip no Banco de Dados */
 
-/* Trecho Responsável pela edição de um Modem no Banco de Dados */
+if(!empty($_POST['hiddenChip'])) {
+	$sql = "UPDATE relatorios_chips SET numero = '".$_POST['inputNumero']."', situacao = '".$_POST['inputSituacao']."', normal = '".$_POST['inputNormal']."', micro = '".$_POST['inputMicro']."', nano = '".$_POST['inputNano']."', id_linha = '".$_POST['inputLinha']."' WHERE id=".$_POST['hiddenChip'];
+	$res = mysql_query($sql, $con);
+
+	$sql1 = "INSERT INTO relatorios_historico VALUES ('', 'Chip Editado', '".date("Y-m-d H:i:s")."', 'O Chip ".$_POST['hiddenChip']." foi Editado com Sucesso.', '".$_SESSION['userId']."', '2')";
+	$res1= mysql_query($sql1, $con);
+
+	//echo "AQUI: ".$sql1;
+
+	$resultado = "Chip Alterado com Sucesso!";
+}
+
+
+/* Trecho Responsável pela adição de um Chip no Banco de Dados */
+
+if(!empty($_POST['hiddenNovoChip'])) {
+	$sql = "INSERT INTO relatorios_chips VALUES ('', '".$_POST['inputNumero']."', '".$_POST['inputNormal']."', '".$_POST['inputMicro']."', '".$_POST['inputNano']."', '".$_POST['inputLinha']."', '".$_POST['inputSituacao']."')";
+	$res = mysql_query($sql, $con);
+
+	$sql1 = "INSERT INTO relatorios_historico VALUES ('', 'Chip Adicionado', '".date("Y-m-d H:i:s")."', 'Um Novo Chip foi Adicionado com Sucesso.', '".$_SESSION['userId']."', '2')";
+	$res1= mysql_query($sql1, $con);
+
+	$resultado = "Chip Inserido com Sucesso!";
+}
+
+
+
+
+
+
+
+
+
+/* Trecho Responsável pela edição de uma Linha no Banco de Dados */
 
 if(!empty($_POST['hiddenLinha'])) {
 	$sql = "UPDATE relatorios_linhas SET numero = '".$_POST['inputNumero']."', situacao = '".$_POST['inputSituacao']."', status = '".$_POST['inputStatus']."' WHERE id=".$_POST['hiddenLinha'];
@@ -26,7 +60,7 @@ if(!empty($_POST['hiddenLinha'])) {
 /* Trecho Responsável pela adição de uma Linha no Banco de Dados */
 
 if(!empty($_POST['hiddenNovoLinha'])) {
-	$sql = "INSERT INTO relatorios_linhas VALUES ('', '".$_POST['inputNumero']."', '".$_POST['inputSituacao']."', '".$_POST['inputStatus']."', '')";
+	$sql = "INSERT INTO relatorios_linhas VALUES ('', '".$_POST['inputNumero']."', '".$_POST['inputSituacao']."', '".$_POST['inputStatus']."')";
 	$res = mysql_query($sql, $con);
 
 	$sql1 = "INSERT INTO relatorios_historico VALUES ('', 'Linha Adicionada', '".date("Y-m-d H:i:s")."', 'Uma Nova Linha foi Adicionada com Sucesso.', '".$_SESSION['userId']."', '2')";
@@ -42,7 +76,7 @@ if(!empty($_POST['hiddenNovoLinha'])) {
 /* Trecho Responsável pela edição de um Modem no Banco de Dados */
 
 if(!empty($_POST['hiddenModem'])) {
-	$sql = "UPDATE relatorios_modens SET operadora = '".$_POST['inputOperadora']."', imei = '".$_POST['inputImei']."', situacao = '".$_POST['inputSituacao']."', usuario = '".$_POST['inputUsuario']."', matricula = '".$_POST['inputMatriculaUsuario']."', setor = '".$_POST['inputSetor']."', unidade = '".$_POST['inputUnidade']."' WHERE id=".$_POST['hiddenModem'];
+	$sql = "UPDATE relatorios_modens SET operadora = '".$_POST['inputOperadora']."', imei = '".$_POST['inputImei']."', situacao = '".$_POST['inputSituacao']."', usuario = '".$_POST['inputUsuario']."', matricula = '".$_POST['inputMatriculaUsuario']."', setor = '".$_POST['inputSetor']."', unidade = '".$_POST['inputUnidade']."', id_chip = '".$_POST['inputChip']."' WHERE id=".$_POST['hiddenModem'];
 	$res = mysql_query($sql, $con);
 
 	$sql1 = "INSERT INTO relatorios_historico VALUES ('', 'Modem Editado', '".date("Y-m-d H:i:s")."', 'O Modem ".$_POST['hiddenModem']." foi Editado com Sucesso.', '".$_SESSION['userId']."', '2')";
@@ -57,7 +91,7 @@ if(!empty($_POST['hiddenModem'])) {
 /* Trecho Responsável pela adição de um Modem no Banco de Dados */
 
 if(!empty($_POST['hiddenNovoModem'])) {
-	$sql = "INSERT INTO relatorios_modens VALUES ('', '".$_POST['inputOperadora']."', '".$_POST['inputImei']."', '".$_POST['inputSituacao']."', '".$_POST['inputUsuario']."', '".$_POST['inputMatriculaUsuario']."', '".$_POST['inputSetor']."', '".$_POST['inputUnidade']."', '')";
+	$sql = "INSERT INTO relatorios_modens VALUES ('', '".$_POST['inputOperadora']."', '".$_POST['inputImei']."', '".$_POST['inputSituacao']."', '".$_POST['inputUsuario']."', '".$_POST['inputMatriculaUsuario']."', '".$_POST['inputSetor']."', '".$_POST['inputUnidade']."', '".$_POST['inputChip']."')";
 	$res = mysql_query($sql, $con);
 
 	$sql1 = "INSERT INTO relatorios_historico VALUES ('', 'Modem Adicionado', '".date("Y-m-d H:i:s")."', 'Um Novo Modem foi Adicionado com Sucesso.', '".$_SESSION['userId']."', '2')";
@@ -68,8 +102,12 @@ if(!empty($_POST['hiddenNovoModem'])) {
 
 
 
+
+/* Trecho Responsável pela edição de um Aparelho no Banco de Dados */
+
+
 if(!empty($_POST['hiddenAparelho'])) {
-	$sql = "UPDATE relatorios_telefones SET marca = '".$_POST['inputMarca']."', modelo = '".$_POST['inputModelo']."', imei = '".$_POST['inputImei']."', pin = '".$_POST['inputPin']."', situacao = '".$_POST['inputSituacao']."', problema = '".$_POST['inputProblema']."', usuario = '".$_POST['inputUsuario']."', matricula = '".$_POST['inputMatriculaUsuario']."', setor = '".$_POST['inputSetor']."', unidade = '".$_POST['inputUnidade']."' WHERE id=".$_POST['hiddenAparelho'];
+	$sql = "UPDATE relatorios_telefones SET marca = '".$_POST['inputMarca']."', modelo = '".$_POST['inputModelo']."', imei = '".$_POST['inputImei']."', pin = '".$_POST['inputPin']."', situacao = '".$_POST['inputSituacao']."', problema = '".$_POST['inputProblema']."', usuario = '".$_POST['inputUsuario']."', matricula = '".$_POST['inputMatriculaUsuario']."', setor = '".$_POST['inputSetor']."', unidade = '".$_POST['inputUnidade']."', id_chip = '".$_POST['inputChip']."' WHERE id=".$_POST['hiddenAparelho'];
 	$res = mysql_query($sql, $con);
 
 	$sql1 = "INSERT INTO relatorios_historico VALUES ('', 'Telefone Editado', '".date("Y-m-d H:i:s")."', 'O Telefone ".$_POST['hiddenAparelho']." foi Editado com Sucesso.', '".$_SESSION['userId']."', '2')";
@@ -80,8 +118,11 @@ if(!empty($_POST['hiddenAparelho'])) {
 	$resultado = "Aparelho Alterado com Sucesso!";
 }
 
+
+/* Trecho Responsável pela adição de um Aparelho no Banco de Dados */
+
 if(!empty($_POST['hiddenNovoAparelho'])) {
-	$sql = "INSERT INTO relatorios_telefones VALUES ('', '".$_POST['inputMarca']."', '".$_POST['inputModelo']."', '".$_POST['inputImei']."', '".$_POST['inputPin']."', '".$_POST['inputSituacao']."', '".$_POST['inputProblema']."', '".$_POST['inputUsuario']."', '".$_POST['inputSetor']."', '".$_POST['inputUnidade']."', '".$_POST['inputMatriculaUsuario']."')";
+	$sql = "INSERT INTO relatorios_telefones VALUES ('', '".$_POST['inputMarca']."', '".$_POST['inputModelo']."', '".$_POST['inputImei']."', '".$_POST['inputPin']."', '".$_POST['inputSituacao']."', '".$_POST['inputProblema']."', '".$_POST['inputUsuario']."', '".$_POST['inputSetor']."', '".$_POST['inputUnidade']."', '".$_POST['inputMatriculaUsuario']."', '".$_POST['inputChip']."')";
 	$res = mysql_query($sql, $con);
 
 	$sql1 = "INSERT INTO relatorios_historico VALUES ('', 'Telefone Adicionado', '".date("Y-m-d H:i:s")."', 'Um Novo Telefone foi Adicionado com Sucesso.', '".$_SESSION['userId']."', '2')";
@@ -155,7 +196,7 @@ $(function(){
 </header>
 
 <section id="home">
-	<p>Olá, <strong>Thiago Santos</strong>. Use o Menu Superior para Navegar.</p>
+	<p>Olá, <strong><?=$_SESSION['nome']?></strong>. Use o Menu Superior para Navegar.</p>
 </section>
 
 
@@ -221,7 +262,7 @@ $(function () {
 	$( "section" ).delegate( ".linhaResultado", "click", function() {
 	    var id = $(this).data('cod');
 	    //alert("AQUI: "+id);
-		$('#telefones').html('Carregando...');
+		//$('#telefones').html('Carregando...');
 		// Do an ajax request
 		$.ajax({
 		  url: "aparelho.php?id="+id
@@ -233,7 +274,7 @@ $(function () {
 
 	$('#adicionarAparelho').click(function() {
 
-		$('#telefones').html('Carregando...');
+		//$('#telefones').html('Carregando...');
 		// Do an ajax request
 		$.ajax({
 		  url: "aparelho.php?id=novo"
@@ -250,9 +291,105 @@ $(function () {
 
 
 
-<section id="chips">
+<section id="chips" ng-app="appChips" ng-controller="myCtrlChips">
 	<h2>Lista de Chips</h2>
+
+	<input placeholder="Pesquisa Rápida" name="pesquisarChips" id="pesquisarChips" type="text" ng-model="filtroChip"><a id="adicionarChip">Adicionar</a>
+
+	<div class="tituloResultados">
+	<a  class="linkTitulo5 selecionado" ng-click="ordenar('id');">ID</a><a  class="linkTitulo5" ng-click="ordenar('numero');">Número</a><a  class="linkTitulo5" ng-click="ordenar('chip');">Tipo de Chip</a><a  class="linkTitulo5" ng-click="ordenar('id_linha');">Linha</a>
+	</div>
+
+	<a data-cod="{{x.id}}" class="linhaResultado5 {{x.situacao}}" title="{{x.situacao}}" ng-repeat="x in recordsChips | orderBy:myOrderBy | filter: filtroChip">
+		<div class="colunaResultado">{{x.id}}</div><div class="colunaResultado">{{x.numero}}</div><div class="colunaResultado"><span class="{{x.normal}}">{{x.normal}}</span><span class="{{x.micro}}">{{x.micro}}</span><span class="{{x.nano}}">{{x.nano}}</span></div><div class="colunaResultado">Linha: {{x.id_linha}}</div>
+	</a>
+
+	<script>
+
+	$(function() {
+		$('.linkTitulo5').click(function() {
+			var elementos = document.getElementsByClassName('linkTitulo5');
+
+		for (var x = 0; x < elementos.length; x++) {
+			elementos[x].className = "linkTitulo5";
+		}
+
+		this.className = "linkTitulo5 selecionado";
+
+		});
+	});
+
+	var app = angular.module("appChips", []);
+	app.controller("myCtrlChips", function($scope) {
+    
+    $scope.recordsChips = [
+
+	<?php
+
+	$sql = "SELECT id, numero, situacao, id_linha,
+	CASE normal WHEN 'X' THEN 'Normal' ELSE 'nao' END AS normal,
+	CASE micro WHEN 'X' THEN 'Micro' ELSE 'nao' END AS micro,
+	CASE nano WHEN 'X' THEN 'Nano' ELSE 'nao' END AS nano
+	FROM relatorios_chips ORDER BY id DESC";
+	$res = mysql_query($sql, $con);
+	$num = mysql_num_rows($res);
+
+	for($i = 0; $i < $num; $i++) {
+	$row = mysql_fetch_array($res);
+		if($i == 0) echo "{";
+		else echo ", {";
+		echo "'id': ".$row['id'].", 'numero': '".$row['numero']."', 'situacao': '".$row['situacao']."', 'id_linha': '".$row['id_linha']."', 'normal': '".$row['normal']."', 'micro': '".$row['micro']."', 'nano': '".$row['nano']."' }";
+	}
+	
+	?>
+
+    ];
+      $scope.ordenar = function(x) {
+      	if($scope.myOrderBy == x) x = "-"+x;
+	    $scope.myOrderBy = x;
+	  }
+
+});
+
+
+$(function () {
+	$( "section" ).delegate( ".linhaResultado5", "click", function() {
+	    var id = $(this).data('cod');
+	    //alert("AQUI: "+id);
+		//$('#linhas').html('Carregando...');
+		// Do an ajax request
+		$.ajax({
+		  url: "chip.php?id="+id
+		}).done(function(data) { // data what is sent back by the php page
+		  $('#chips').html(data); // display data
+		});
+
+	});
+
+	$('#adicionarChip').click(function() {
+
+		//$('#linhas').html('Carregando...');
+		// Do an ajax request
+		$.ajax({
+		  url: "chip.php?id=novo"
+		}).done(function(data) { // data what is sent back by the php page
+		  $('#chips').html(data); // display data
+		});
+
+	});
+});
+
+angular.bootstrap('#chips', ['appChips']);
+	
+</script>
+
+
+
 </section>
+
+
+
+
 
 
 
@@ -299,7 +436,7 @@ $(function () {
 	$row = mysql_fetch_array($res);
 		if($i == 0) echo "{";
 		else echo ", {";
-		echo "'id': ".$row['id'].", 'numero': '".$row['numero']."', 'situacao': '".$row['situacao']."', 'status': '".$row['status']."', 'id_chip': '".$row['id_chip']."' }";
+		echo "'id': ".$row['id'].", 'numero': '".$row['numero']."', 'situacao': '".$row['situacao']."', 'status': '".$row['status']."' }";
 	}
 	
 	?>
@@ -317,7 +454,7 @@ $(function () {
 	$( "section" ).delegate( ".linhaResultado4", "click", function() {
 	    var id = $(this).data('cod');
 	    //alert("AQUI: "+id);
-		$('#linhas').html('Carregando...');
+		//$('#linhas').html('Carregando...');
 		// Do an ajax request
 		$.ajax({
 		  url: "linha.php?id="+id
@@ -329,7 +466,7 @@ $(function () {
 
 	$('#adicionarLinha').click(function() {
 
-		$('#linhas').html('Carregando...');
+		//$('#linhas').html('Carregando...');
 		// Do an ajax request
 		$.ajax({
 		  url: "linha.php?id=novo"
@@ -414,7 +551,7 @@ $(function () {
 	$( "section" ).delegate( ".linhaResultado3", "click", function() {
 	    var id = $(this).data('cod');
 	    //alert("AQUI: "+id);
-		$('#modens').html('Carregando...');
+		//$('#modens').html('Carregando...');
 		// Do an ajax request
 		$.ajax({
 		  url: "modem.php?id="+id
@@ -426,7 +563,7 @@ $(function () {
 
 	$('#adicionarModem').click(function() {
 
-		$('#modens').html('Carregando...');
+		//$('#modens').html('Carregando...');
 		// Do an ajax request
 		$.ajax({
 		  url: "modem.php?id=novo"
