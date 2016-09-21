@@ -5,13 +5,47 @@
 include "../conexao.php";
 
 
+
+
+
+/* Trecho Responsável pela edição de um Modem no Banco de Dados */
+
+if(!empty($_POST['hiddenLinha'])) {
+	$sql = "UPDATE relatorios_linhas SET numero = '".$_POST['inputNumero']."', situacao = '".$_POST['inputSituacao']."', status = '".$_POST['inputStatus']."' WHERE id=".$_POST['hiddenLinha'];
+	$res = mysql_query($sql, $con);
+
+	$sql1 = "INSERT INTO relatorios_historico VALUES ('', 'Linha Editada', '".date("Y-m-d H:i:s")."', 'A Linha ".$_POST['hiddenLinha']." foi Editada com Sucesso.', '".$_SESSION['userId']."', '2')";
+	$res1= mysql_query($sql1, $con);
+
+	//echo "AQUI: ".$sql1;
+
+	$resultado = "Linha Alterada com Sucesso!";
+}
+
+
+/* Trecho Responsável pela adição de uma Linha no Banco de Dados */
+
+if(!empty($_POST['hiddenNovoLinha'])) {
+	$sql = "INSERT INTO relatorios_linhas VALUES ('', '".$_POST['inputNumero']."', '".$_POST['inputSituacao']."', '".$_POST['inputStatus']."', '')";
+	$res = mysql_query($sql, $con);
+
+	$sql1 = "INSERT INTO relatorios_historico VALUES ('', 'Linha Adicionada', '".date("Y-m-d H:i:s")."', 'Uma Nova Linha foi Adicionada com Sucesso.', '".$_SESSION['userId']."', '2')";
+	$res1= mysql_query($sql1, $con);
+
+	$resultado = "Linha Inserida com Sucesso!";
+}
+
+
+
+
+
 /* Trecho Responsável pela edição de um Modem no Banco de Dados */
 
 if(!empty($_POST['hiddenModem'])) {
-	$sql = "UPDATE relatorios_modens SET aparelho = '".$_POST['inputAparelho']."', imei = '".$_POST['inputImei']."', situacao = '".$_POST['inputSituacao']."', usuario = '".$_POST['inputUsuario']."', matricula = '".$_POST['inputMatriculaUsuario']."', setor = '".$_POST['inputSetor']."', unidade = '".$_POST['inputUnidade']."' WHERE id=".$_POST['hiddenAparelho'];
+	$sql = "UPDATE relatorios_modens SET operadora = '".$_POST['inputOperadora']."', imei = '".$_POST['inputImei']."', situacao = '".$_POST['inputSituacao']."', usuario = '".$_POST['inputUsuario']."', matricula = '".$_POST['inputMatriculaUsuario']."', setor = '".$_POST['inputSetor']."', unidade = '".$_POST['inputUnidade']."' WHERE id=".$_POST['hiddenModem'];
 	$res = mysql_query($sql, $con);
 
-	$sql1 = "INSERT INTO relatorios_historico VALUES ('', 'Modem Editado', '".date("Y-m-d H:i:s")."', 'O Modem ".$_POST['hiddenAparelho']." foi Editado com Sucesso.', '".$_SESSION['userId']."', '2')";
+	$sql1 = "INSERT INTO relatorios_historico VALUES ('', 'Modem Editado', '".date("Y-m-d H:i:s")."', 'O Modem ".$_POST['hiddenModem']." foi Editado com Sucesso.', '".$_SESSION['userId']."', '2')";
 	$res1= mysql_query($sql1, $con);
 
 	//echo "AQUI: ".$sql1;
@@ -23,7 +57,7 @@ if(!empty($_POST['hiddenModem'])) {
 /* Trecho Responsável pela adição de um Modem no Banco de Dados */
 
 if(!empty($_POST['hiddenNovoModem'])) {
-	$sql = "INSERT INTO relatorios_modens VALUES ('', '".$_POST['inputOperadora']."', '".$_POST['inputImei']."', '".$_POST['inputSituacao']."', '".$_POST['inputUsuario']."', '".$_POST['inputMatriculaUsuario']."', '".$_POST['inputSetor']."', '".$_POST['inputUnidade']."', '', '')";
+	$sql = "INSERT INTO relatorios_modens VALUES ('', '".$_POST['inputOperadora']."', '".$_POST['inputImei']."', '".$_POST['inputSituacao']."', '".$_POST['inputUsuario']."', '".$_POST['inputMatriculaUsuario']."', '".$_POST['inputSetor']."', '".$_POST['inputUnidade']."', '')";
 	$res = mysql_query($sql, $con);
 
 	$sql1 = "INSERT INTO relatorios_historico VALUES ('', 'Modem Adicionado', '".date("Y-m-d H:i:s")."', 'Um Novo Modem foi Adicionado com Sucesso.', '".$_SESSION['userId']."', '2')";
@@ -222,9 +256,100 @@ $(function () {
 
 
 
-<section id="linhas">
+<section id="linhas" ng-app="appLinhas" ng-controller="myCtrlLinhas">
 	<h2>Lista de Linhas</h2>
+
+	<input placeholder="Pesquisa Rápida" name="pesquisarLinhas" id="pesquisarLinhas" type="text" ng-model="filtroLinha"><a id="adicionarLinha">Adicionar</a>
+
+	<div class="tituloResultados">
+	<a  class="linkTitulo4 selecionado" ng-click="ordenar('id');">ID</a><a  class="linkTitulo4" ng-click="ordenar('numero');">Número</a><a  class="linkTitulo4" ng-click="ordenar('chip');">Chip</a><a  class="linkTitulo4" ng-click="ordenar('status');">Status</a>
+	</div>
+
+	<a data-cod="{{x.id}}" class="linhaResultado4 {{x.situacao}}" title="{{x.situacao}}" ng-repeat="x in recordsLinhas | orderBy:myOrderBy | filter: filtroLinha">
+		<div class="colunaResultado">{{x.id}}</div><div class="colunaResultado">{{x.numero}}</div><div class="colunaResultado">{{x.chip}}</div><div class="colunaResultado">{{x.status}}</div>
+	</a>
+
+	<script>
+
+	$(function() {
+		$('.linkTitulo4').click(function() {
+			var elementos = document.getElementsByClassName('linkTitulo4');
+
+		for (var x = 0; x < elementos.length; x++) {
+			elementos[x].className = "linkTitulo4";
+		}
+
+		this.className = "linkTitulo4 selecionado";
+
+		});
+	});
+
+	var app = angular.module("appLinhas", []);
+	app.controller("myCtrlLinhas", function($scope) {
+    
+    $scope.recordsLinhas = [
+
+	<?php
+
+	$sql = "SELECT * FROM relatorios_linhas ORDER BY id DESC";
+	$res = mysql_query($sql, $con);
+	$num = mysql_num_rows($res);
+
+	for($i = 0; $i < $num; $i++) {
+	$row = mysql_fetch_array($res);
+		if($i == 0) echo "{";
+		else echo ", {";
+		echo "'id': ".$row['id'].", 'numero': '".$row['numero']."', 'situacao': '".$row['situacao']."', 'status': '".$row['status']."', 'id_chip': '".$row['id_chip']."' }";
+	}
+	
+	?>
+
+    ];
+      $scope.ordenar = function(x) {
+      	if($scope.myOrderBy == x) x = "-"+x;
+	    $scope.myOrderBy = x;
+	  }
+
+});
+
+
+$(function () {
+	$('.linhaResultado4').click(function() {
+	    var id = $(this).data('cod');
+	    //alert("AQUI: "+id);
+		$('#linhas').html('Carregando...');
+		// Do an ajax request
+		$.ajax({
+		  url: "linha.php?id="+id
+		}).done(function(data) { // data what is sent back by the php page
+		  $('#linhas').html(data); // display data
+		});
+
+	});
+
+	$('#adicionarLinha').click(function() {
+
+		$('#linhas').html('Carregando...');
+		// Do an ajax request
+		$.ajax({
+		  url: "linha.php?id=novo"
+		}).done(function(data) { // data what is sent back by the php page
+		  $('#linhas').html(data); // display data
+		});
+
+	});
+});
+
+angular.bootstrap('#linhas', ['appLinhas']);
+	
+</script>
+
+
+
 </section>
+
+
+
 
 
 
@@ -271,7 +396,7 @@ $(function () {
 	$row = mysql_fetch_array($res);
 		if($i == 0) echo "{";
 		else echo ", {";
-		echo "'id': ".$row['id'].", 'operadora': '".$row['operadora']."', 'situacao': '".$row['situacao']."', 'usuario': '".$row['usuario']."', 'imei': '".$row['imei']."', 'setor': '".$row['setor']."', 'unidade': '".$row['unidade']."', 'id_linha': '".$row['id_linha']."', 'id_chip': '".$row['id_chip']."' }";
+		echo "'id': ".$row['id'].", 'operadora': '".$row['operadora']."', 'situacao': '".$row['situacao']."', 'usuario': '".$row['usuario']."', 'imei': '".$row['imei']."', 'setor': '".$row['setor']."', 'unidade': '".$row['unidade']."', 'id_chip': '".$row['id_chip']."' }";
 	}
 	
 	?>

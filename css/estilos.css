@@ -229,7 +229,7 @@ a.acao.selecionado {
     border-color: #38C;
 }
 
-.linhaResultado, .linhaResultado3 {
+.linhaResultado, .linhaResultado3, .linhaResultado4 {
     display: block;
     padding: 12px 2%;
     width: 86%;
@@ -237,7 +237,7 @@ a.acao.selecionado {
     text-align: center;
 }
 
-.linhaResultado:nth-child(odd), .linhaResultado3:nth-child(odd) {
+.linhaResultado:nth-child(odd), .linhaResultado3:nth-child(odd), .linhaResultado4:nth-child(odd) {
 	background: #CCC;
 }
 
@@ -318,7 +318,7 @@ a.linkTitulo2 {
     width: 25%;
 }
 
-.linhaResultado:hover, .linhaResultado3:hover {
+.linhaResultado:hover, .linhaResultado3:hover, .linhaResultado4:hover {
     background: #578fce;
     color: #FFF;
     cursor: pointer;
@@ -415,7 +415,7 @@ div#resultadoSql {
     left: 25%;
 }
 
-input#pesquisarAparelhos, input#pesquisarModens {
+input#pesquisarAparelhos, input#pesquisarModens, input#pesquisarLinhas {
     margin: 10px 0;
     width: 60%;
     padding: 16px;
@@ -430,13 +430,13 @@ input#pesquisarAparelhos, input#pesquisarModens {
     -webkit-transition: all 0.43s;
 }
 
-input#pesquisarAparelhos:focus, input#pesquisarModens:focus {
+input#pesquisarAparelhos:focus, input#pesquisarModens:focus, input#pesquisarlinhas:focus {
     border: #222 1px solid;
     background: #525252;
     color: #DDD;
 }
 
-a#adicionarAparelho, a#adicionarModem {
+a#adicionarAparelho, a#adicionarModem, a#adicionarLinha {
     width: 27%;
     padding: 18px 1%;
     background: #999;
@@ -498,6 +498,15 @@ img#logoInterno {
     min-height: 14px;
 }
 
+.linhaResultado4 .colunaResultado {
+    width: 25%;
+    min-height: 14px;
+}
+
 a.linkTitulo3 {
     width: 16%;
+}
+
+a.linkTitulo4 {
+    width: 25%;
 }
