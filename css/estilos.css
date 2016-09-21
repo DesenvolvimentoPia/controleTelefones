@@ -245,7 +245,7 @@ div.colunaResultado {
     width: 14%;
     display: inline-block;
     text-align: center;
-    vertical-align: top;
+    vertical-align: middle;
 }
 
 footer {
@@ -311,7 +311,7 @@ div.colunaResultado2 {
     width: 25%;
     display: inline-block;
     text-align: center;
-    vertical-align: top;
+    vertical-align: middle;
 }
 
 a.linkTitulo2 {
