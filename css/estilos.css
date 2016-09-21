@@ -487,9 +487,17 @@ form span {
     color: #79C;
 }
 
-
 img#logoInterno {
     width: 20%;
     vertical-align: middle;
     margin: 0 13% 0 -33%;
+}
+
+.linhaResultado3 .colunaResultado {
+    width: 16%;
+    min-height: 14px;
+}
+
+a.linkTitulo3 {
+    width: 16%;
 }
