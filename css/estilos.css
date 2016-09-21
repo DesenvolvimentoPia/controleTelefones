@@ -229,7 +229,7 @@ a.acao.selecionado {
     border-color: #38C;
 }
 
-.linhaResultado {
+.linhaResultado, .linhaResultado3 {
     display: block;
     padding: 12px 2%;
     width: 86%;
@@ -237,7 +237,7 @@ a.acao.selecionado {
     text-align: center;
 }
 
-.linhaResultado:nth-child(odd) {
+.linhaResultado:nth-child(odd), .linhaResultado3:nth-child(odd) {
 	background: #CCC;
 }
 
@@ -318,7 +318,7 @@ a.linkTitulo2 {
     width: 25%;
 }
 
-.linhaResultado:hover {
+.linhaResultado:hover, .linhaResultado3:hover {
     background: #578fce;
     color: #FFF;
     cursor: pointer;
@@ -415,7 +415,7 @@ div#resultadoSql {
     left: 25%;
 }
 
-input#pesquisarAparelhos {
+input#pesquisarAparelhos, input#pesquisarModens {
     margin: 10px 0;
     width: 60%;
     padding: 16px;
@@ -430,13 +430,13 @@ input#pesquisarAparelhos {
     -webkit-transition: all 0.43s;
 }
 
-input#pesquisarAparelhos:focus {
+input#pesquisarAparelhos:focus, input#pesquisarModens:focus {
     border: #222 1px solid;
     background: #525252;
     color: #DDD;
 }
 
-a#adicionarAparelho {
+a#adicionarAparelho, a#adicionarModem {
     width: 27%;
     padding: 18px 1%;
     background: #999;
@@ -454,7 +454,7 @@ a#adicionarAparelho {
     -webkit-transition: all 0.43s;
 }
 
-a#adicionarAparelho:hover, a#botaoVoltar:hover {
+a#adicionarAparelho:hover, a#botaoVoltar:hover, , a#adicionarModem:hover {
     background: #578fce;
 }
 
