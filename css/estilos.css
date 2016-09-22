@@ -131,14 +131,14 @@ h1 {
     padding: 25px 0;
     margin: 0 0 7px;
     font-size: 28px;
-    font-family: "Champagne & Limousines";
+    font-family: "Champagne & Limousines", 'Champagne';
 }
 
 nav a {
     padding: 16px 34px;
     display: inline-block;
     color: #FFF;
-    font-family: "Champagne & Limousines";
+    font-family: "Champagne & Limousines", 'Champagne';
     font-size: 20px;
     border-bottom: 5px #EEE solid;
     cursor: pointer;
@@ -549,4 +549,17 @@ a.nmn.selecionado {
 
 .colunaResultado span.nao {
     display: none;
+}
+
+
+
+
+@font-face {
+    font-family: 'Champagne';
+    src: url('../../fontes/champagne__limousines-webfont.eot');
+    src: url('../../fontes/champagne__limousines-webfont.eot?#iefix') format('embedded-opentype'),
+        url('../../fontes/champagne__limousines-webfont.woff') format('woff'),
+        url('../../fontes/champagne__limousines-webfont.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
 }

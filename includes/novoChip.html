@@ -31,7 +31,7 @@ include "../conexao.php";
 		for($x = 0; $x < $numChip; $x++) {
 			$rowChip = mysql_fetch_array($resChip);
 		?>		
-		<option value="<?=$rowChip['id']?>"><?="Linha ".$rowChip['id']." - ".$rowChip['numero']?></option>
+		<option value="<?=$rowChip['id']?>"><?=$rowChip['numero']?></option>
 		<?php } ?>
 	</select>
 

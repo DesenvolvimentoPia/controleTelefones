@@ -39,7 +39,7 @@ $rowAparelho = mysql_fetch_array($resAparelho);
 
 			$rowLinha = mysql_fetch_array($resLinha);
 		?>		
-		<option <?php if($rowAparelho['id_linha'] == $rowLinha['id']) echo "selected"; ?> value="<?=$rowLinha['id']?>"><?="Linha ".$rowLinha['id']." - ".$rowLinha['numero']?></option>
+		<option <?php if($rowAparelho['id_linha'] == $rowLinha['id']) echo "selected"; ?> value="<?=$rowLinha['id']?>"><?=$rowLinha['numero']?></option>
 		<?php } ?>
 	</select>
 
