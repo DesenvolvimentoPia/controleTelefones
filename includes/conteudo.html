@@ -10,13 +10,53 @@ include "../conexao.php";
 /* Trecho Responsável pela adição de um Modem no Banco de Dados */
 
 if(!empty($_POST['hiddenNovoMovimento'])) {
-	$sql = "INSERT INTO relatorios_movimentos VALUES ('', '".$_POST['inputTipoItem']."', '".$_POST['inputIdItem']."', '".$_POST['inputDirecao']."', '".$_POST['inputTipoUsuario']."', '".$_POST['inputUsuario']."', '".date("Y-m-d H:i:s")."', '".$_POST['inputSituacao']."', '".$_POST['inputDescricao']."')";
+	$sql = "INSERT INTO relatorios_movimentos VALUES ('', '".$_POST['inputTipoItem']."', '".$_POST['inputIdItem']."', '".$_POST['inputDirecao']."', '".$_POST['inputTipoUsuario']."', '".$_POST['inputUsuario']."', '".$_POST['inputMatricula']."', '".date("Y-m-d H:i:s")."', '".$_POST['inputSituacao']."', '".$_POST['inputDescricao']."')";
 	$res = mysql_query($sql, $con);
 
 	$sql1 = "INSERT INTO relatorios_historico VALUES ('', 'Movimento Adicionado', '".date("Y-m-d H:i:s")."', 'Um Novo Movimento foi Adicionado com Sucesso.', '".$_SESSION['userId']."', '2')";
 	$res1= mysql_query($sql1, $con);
 
+	$sqlMov = "SELECT * FROM relatorios_movimentos ORDER BY id DESC";
+	$resMov = mysql_query($sqlMov, $con);
+	$rowMov = mysql_fetch_array($resMov);
+
 	$resultado = "Movimento Inserido com Sucesso!";
+
+	if($_POST['inputTipoItem'] == "telefones" && $_POST['inputDirecao'] == "Entrega") {
+
+		$sqlCel = "SELECT relatorios_telefones.id, relatorios_telefones.marca, relatorios_telefones.modelo, relatorios_telefones.imei, relatorios_telefones.pin, relatorios_chips.id AS chip, relatorios_linhas.id AS linha FROM relatorios_telefones 
+		LEFT JOIN relatorios_chips ON
+		relatorios_telefones.id_chip = relatorios_chips.id
+		
+		LEFT JOIN relatorios_linhas ON
+		relatorios_chips.id_linha = relatorios_linhas.id
+		
+		WHERE relatorios_telefones.id = '".$_POST['inputIdItem']."'";
+		$resCel = mysql_query($sqlCel, $con);
+		$rowCel = mysql_fetch_array($resCel);
+
+		if(!empty($rowCel['id'])) {
+			$sqlChip = "UPDATE relatorios_telefones SET situacao = '".$_POST['inputSituacao']."', usuario = '".$_POST['inputUsuario']."', matricula = '".$_POST['inputMatricula']."' WHERE id = ".$rowCel['id'];
+			$resChip = mysql_query($sqlChip, $con);
+	//		echo $sqlChip;
+		}
+
+	//	echo $sqlCel;
+
+		if(!empty($rowCel['chip'])) {
+			$sqlChip = "UPDATE relatorios_chips SET situacao = '".$_POST['inputSituacao']."' WHERE id = ".$rowCel['chip'];
+			$resChip = mysql_query($sqlChip, $con);
+	//		echo $sqlChip;
+		}
+
+		if(!empty($rowCel['linha'])) {
+			$sqlChip = "UPDATE relatorios_linhas SET situacao = '".$_POST['inputSituacao']."' WHERE id = ".$rowCel['linha'];
+			$resChip = mysql_query($sqlChip, $con);
+	//		echo $sqlChip;
+		}
+
+	?><script>var win = window.open('entregaCelularTermo.php?usuario=<?=$_POST['inputUsuario'];?>&matricula=<?=$_POST['inputMatricula'];?>&imei=<?=$rowCel['imei'];?>&pin=<?=$rowCel['pin'];?>&marca=<?=$rowCel['marca'];?>&modelo=<?=$rowCel['modelo'];?>&codigoCelular=<?=$rowCel['id'];?>&codigoMovimento=<?=$rowMov['id'];?>', '_blank');</script><?php
+	}
 }
 
 
@@ -210,6 +250,7 @@ $(function(){
 		<a href="#linhas" class="acao">Linhas</a>
 		<a href="#modens" class="acao">Modens</a>
 		<a href="#movimentos" class="acao">Movimentos</a>
+		<a href="#perfis" class="acao">Perfis</a>
 		<a href="#historico" class="acao">Histórico</a>
 		<a href="../">Voltar</a>
 	</nav>
@@ -217,557 +258,38 @@ $(function(){
 </header>
 
 <section id="home">
-	<p>Olá, <strong><?=$_SESSION['nome']?></strong>. Use o Menu Superior para Navegar.</p>
+	<?php include "sections/home.tpl"; ?>
 </section>
-
-
-
-
-
-
-
-
-
-
 
 <section id="telefones" ng-app="appTelefones" ng-controller="myCtrlTelefones">
-	<h2>Lista de Telefones</h2>
-
-	<input placeholder="Pesquisa Rápida" name="pesquisarAparelhos" id="pesquisarAparelhos" type="text" ng-model="filtro"><a id="adicionarAparelho">Adicionar</a>
-
-	<div class="tituloResultados">
-	<a  class="linkTitulo selecionado" ng-click="ordenar('id');">ID</a><a  class="linkTitulo" ng-click="ordenar('marca');">Marca</a><a  class="linkTitulo" ng-click="ordenar('modelo');">Modelo</a><a  class="linkTitulo" ng-click="ordenar('usuario');">Usuário</a><a  class="linkTitulo" ng-click="ordenar('imei');">IMEI</a><a  class="linkTitulo" ng-click="ordenar('setor');">Setor</a><a  class="linkTitulo" ng-click="ordenar('unidade');">Unidade</a>
-	</div>
-
-	<a data-cod="{{x.id}}" class="linhaResultado {{x.situacao}}" title="{{x.situacao}} {{x.problema}}" ng-repeat="x in recordsTelefones | orderBy:myOrderBy | filter: filtro">
-		<div class="colunaResultado">{{x.id}}</div><div class="colunaResultado">{{x.marca}}</div><div class="colunaResultado">{{x.modelo}}</div><div class="colunaResultado">{{x.usuario}}</div><div class="colunaResultado">{{x.imei}}</div><div class="colunaResultado">{{x.setor}}</div><div class="colunaResultado">{{x.unidade}}</div>
-	</a>
-
-	<script>
-
-	$(function() {
-		$('.linkTitulo').click(function() {
-			var elementos = document.getElementsByClassName('linkTitulo');
-
-		for (var x = 0; x < elementos.length; x++) {
-			elementos[x].className = "linkTitulo";
-		}
-
-		this.className = "linkTitulo selecionado";
-
-		});
-	});
-
-	var app = angular.module("appTelefones", []);
-	app.controller("myCtrlTelefones", function($scope) {
-    
-    $scope.recordsTelefones = [
-
-	<?php
-
-	$sql = "SELECT * FROM relatorios_telefones ORDER BY id DESC";
-	$res = mysql_query($sql, $con);
-	$num = mysql_num_rows($res);
-
-	for($i = 0; $i < $num; $i++) {
-	$row = mysql_fetch_array($res);
-		if($i == 0) echo "{";
-		else echo ", {";
-		echo "'id': ".$row['id'].", 'marca': '".$row['marca']."', 'modelo': '".$row['modelo']."', 'situacao': '".$row['situacao']."', 'usuario': '".$row['usuario']."', 'imei': '".$row['imei']."', 'setor': '".$row['setor']."', 'unidade': '".$row['unidade']."', 'problema': '".$row['problema']."' }";
-	}
-	
-	?>
-
-    ];
-      $scope.ordenar = function(x) {
-      	if($scope.myOrderBy == x) x = "-"+x;
-	    $scope.myOrderBy = x;
-	  }
-
-});
-
-
-$(function () {
-	$( "section" ).delegate( ".linhaResultado", "click", function() {
-	    var id = $(this).data('cod');
-	    //alert("AQUI: "+id);
-		//$('#telefones').html('Carregando...');
-		// Do an ajax request
-		$.ajax({
-		  url: "aparelho.php?id="+id
-		}).done(function(data) { // data what is sent back by the php page
-		  $('#telefones').html(data); // display data
-		});
-
-	});
-
-	$('#adicionarAparelho').click(function() {
-
-		//$('#telefones').html('Carregando...');
-		// Do an ajax request
-		$.ajax({
-		  url: "aparelho.php?id=novo"
-		}).done(function(data) { // data what is sent back by the php page
-		  $('#telefones').html(data); // display data
-		});
-
-	});
-});
-	
-</script>
-
+	<?php include "sections/telefones.tpl"; ?>
 </section>
-
-
 
 <section id="chips" ng-app="appChips" ng-controller="myCtrlChips">
-	<h2>Lista de Chips</h2>
-
-	<input placeholder="Pesquisa Rápida" name="pesquisarChips" id="pesquisarChips" type="text" ng-model="filtroChip"><a id="adicionarChip">Adicionar</a>
-
-	<div class="tituloResultados">
-	<a  class="linkTitulo5 selecionado" ng-click="ordenar('id');">ID</a><a  class="linkTitulo5" ng-click="ordenar('numero');">Número</a><a  class="linkTitulo5" ng-click="ordenar('chip');">Tipo de Chip</a><a  class="linkTitulo5" ng-click="ordenar('id_linha');">Linha</a>
-	</div>
-
-	<a data-cod="{{x.id}}" class="linhaResultado5 {{x.situacao}}" title="{{x.situacao}}" ng-repeat="x in recordsChips | orderBy:myOrderBy | filter: filtroChip">
-		<div class="colunaResultado">{{x.id}}</div><div class="colunaResultado">{{x.numero}}</div><div class="colunaResultado"><span class="{{x.normal}}">{{x.normal}}</span><span class="{{x.micro}}">{{x.micro}}</span><span class="{{x.nano}}">{{x.nano}}</span></div><div class="colunaResultado">{{x.id_linha}}</div>
-	</a>
-
-	<script>
-
-	$(function() {
-		$('.linkTitulo5').click(function() {
-			var elementos = document.getElementsByClassName('linkTitulo5');
-
-		for (var x = 0; x < elementos.length; x++) {
-			elementos[x].className = "linkTitulo5";
-		}
-
-		this.className = "linkTitulo5 selecionado";
-
-		});
-	});
-
-	var app = angular.module("appChips", []);
-	app.controller("myCtrlChips", function($scope) {
-    
-    $scope.recordsChips = [
-
-	<?php
-
-	$sql = "SELECT relatorios_chips.id AS id, relatorios_chips.numero AS numero, relatorios_chips.situacao AS situacao, relatorios_chips.id_linha AS id_linha,
-	CASE relatorios_chips.normal WHEN 'X' THEN 'Normal' ELSE 'nao' END AS normal,
-	CASE relatorios_chips.micro WHEN 'X' THEN 'Micro' ELSE 'nao' END AS micro,
-	CASE relatorios_chips.nano WHEN 'X' THEN 'Nano' ELSE 'nao' END AS nano,
-	relatorios_linhas.numero AS linha
-	FROM relatorios_chips LEFT JOIN relatorios_linhas ON
-	relatorios_chips.id_linha = relatorios_linhas.id ORDER BY id DESC";
-	$res = mysql_query($sql, $con);
-	$num = mysql_num_rows($res);
-
-	for($i = 0; $i < $num; $i++) {
-	$row = mysql_fetch_array($res);
-	if($row['linha'] == null) $row['linha'] = "Sem Linha";
-		if($i == 0) echo "{";
-		else echo ", {";
-		echo "'id': ".$row['id'].", 'numero': '".$row['numero']."', 'situacao': '".$row['situacao']."', 'id_linha': '".$row['linha']."', 'normal': '".$row['normal']."', 'micro': '".$row['micro']."', 'nano': '".$row['nano']."' }";
-	}
-	
-	?>
-
-    ];
-      $scope.ordenar = function(x) {
-      	if($scope.myOrderBy == x) x = "-"+x;
-	    $scope.myOrderBy = x;
-	  }
-
-});
-
-
-$(function () {
-	$( "section" ).delegate( ".linhaResultado5", "click", function() {
-	    var id = $(this).data('cod');
-	    //alert("AQUI: "+id);
-		//$('#linhas').html('Carregando...');
-		// Do an ajax request
-		$.ajax({
-		  url: "chip.php?id="+id
-		}).done(function(data) { // data what is sent back by the php page
-		  $('#chips').html(data); // display data
-		});
-
-	});
-
-	$('#adicionarChip').click(function() {
-
-		//$('#linhas').html('Carregando...');
-		// Do an ajax request
-		$.ajax({
-		  url: "chip.php?id=novo"
-		}).done(function(data) { // data what is sent back by the php page
-		  $('#chips').html(data); // display data
-		});
-
-	});
-});
-
-angular.bootstrap('#chips', ['appChips']);
-	
-</script>
-
-
-
+	<?php include "sections/chips.tpl"; ?>
 </section>
-
-
-
-
-
-
 
 <section id="linhas" ng-app="appLinhas" ng-controller="myCtrlLinhas">
-	<h2>Lista de Linhas</h2>
-
-	<input placeholder="Pesquisa Rápida" name="pesquisarLinhas" id="pesquisarLinhas" type="text" ng-model="filtroLinha"><a id="adicionarLinha">Adicionar</a>
-
-	<div class="tituloResultados">
-	<a  class="linkTitulo4 selecionado" ng-click="ordenar('id');">ID</a><a  class="linkTitulo4" ng-click="ordenar('numero');">Número</a><a  class="linkTitulo4" ng-click="ordenar('chip');">Chip</a><a  class="linkTitulo4" ng-click="ordenar('status');">Status</a>
-	</div>
-
-	<a data-cod="{{x.id}}" class="linhaResultado4 {{x.situacao}}" title="{{x.situacao}}" ng-repeat="x in recordsLinhas | orderBy:myOrderBy | filter: filtroLinha">
-		<div class="colunaResultado">{{x.id}}</div><div class="colunaResultado">{{x.numero}}</div><div class="colunaResultado">{{x.chip}}</div><div class="colunaResultado">{{x.status}}</div>
-	</a>
-
-	<script>
-
-	$(function() {
-		$('.linkTitulo4').click(function() {
-			var elementos = document.getElementsByClassName('linkTitulo4');
-
-		for (var x = 0; x < elementos.length; x++) {
-			elementos[x].className = "linkTitulo4";
-		}
-
-		this.className = "linkTitulo4 selecionado";
-
-		});
-	});
-
-	var app = angular.module("appLinhas", []);
-	app.controller("myCtrlLinhas", function($scope) {
-    
-    $scope.recordsLinhas = [
-
-	<?php
-
-	$sql = "SELECT * FROM relatorios_linhas ORDER BY id DESC";
-	$res = mysql_query($sql, $con);
-	$num = mysql_num_rows($res);
-
-	for($i = 0; $i < $num; $i++) {
-	$row = mysql_fetch_array($res);
-		if($i == 0) echo "{";
-		else echo ", {";
-		echo "'id': ".$row['id'].", 'numero': '".$row['numero']."', 'situacao': '".$row['situacao']."', 'status': '".$row['status']."' }";
-	}
-	
-	?>
-
-    ];
-      $scope.ordenar = function(x) {
-      	if($scope.myOrderBy == x) x = "-"+x;
-	    $scope.myOrderBy = x;
-	  }
-
-});
-
-
-$(function () {
-	$( "section" ).delegate( ".linhaResultado4", "click", function() {
-	    var id = $(this).data('cod');
-	    //alert("AQUI: "+id);
-		//$('#linhas').html('Carregando...');
-		// Do an ajax request
-		$.ajax({
-		  url: "linha.php?id="+id
-		}).done(function(data) { // data what is sent back by the php page
-		  $('#linhas').html(data); // display data
-		});
-
-	});
-
-	$('#adicionarLinha').click(function() {
-
-		//$('#linhas').html('Carregando...');
-		// Do an ajax request
-		$.ajax({
-		  url: "linha.php?id=novo"
-		}).done(function(data) { // data what is sent back by the php page
-		  $('#linhas').html(data); // display data
-		});
-
-	});
-});
-
-angular.bootstrap('#linhas', ['appLinhas']);
-	
-</script>
-
-
-
+	<?php include "sections/linhas.tpl"; ?>
 </section>
-
-
-
-
-
 
 <section id="modens" ng-app="appModens" ng-controller="myCtrlModens">
-	<h2>Lista de Modens</h2>
-
-	<input placeholder="Pesquisa Rápida" name="pesquisarModens" id="pesquisarModens" type="text" ng-model="filtroModen"><a id="adicionarModem">Adicionar</a>
-
-	<div class="tituloResultados">
-	<a  class="linkTitulo3 selecionado" ng-click="ordenar('id');">ID</a><a  class="linkTitulo3" ng-click="ordenar('operadora');">Operadora</a><a  class="linkTitulo3" ng-click="ordenar('usuario');">Usuário</a><a  class="linkTitulo3" ng-click="ordenar('imei');">IMEI</a><a  class="linkTitulo3" ng-click="ordenar('setor');">Setor</a><a  class="linkTitulo3" ng-click="ordenar('unidade');">Unidade</a>
-	</div>
-
-	<a data-cod="{{x.id}}" class="linhaResultado3 {{x.situacao}}" title="{{x.situacao}}" ng-repeat="x in recordsModens | orderBy:myOrderBy | filter: filtroModen">
-		<div class="colunaResultado">{{x.id}}</div><div class="colunaResultado">{{x.operadora}}</div><div class="colunaResultado">{{x.usuario}}</div><div class="colunaResultado">{{x.imei}}</div><div class="colunaResultado">{{x.setor}}</div><div class="colunaResultado">{{x.unidade}}</div>
-	</a>
-
-	<script>
-
-	$(function() {
-		$('.linkTitulo3').click(function() {
-			var elementos = document.getElementsByClassName('linkTitulo3');
-
-		for (var x = 0; x < elementos.length; x++) {
-			elementos[x].className = "linkTitulo3";
-		}
-
-		this.className = "linkTitulo3 selecionado";
-
-		});
-	});
-
-	var app = angular.module("appModens", []);
-	app.controller("myCtrlModens", function($scope) {
-    
-    $scope.recordsModens = [
-
-	<?php
-
-	$sql = "SELECT * FROM relatorios_modens ORDER BY id DESC";
-	$res = mysql_query($sql, $con);
-	$num = mysql_num_rows($res);
-
-	for($i = 0; $i < $num; $i++) {
-	$row = mysql_fetch_array($res);
-		if($i == 0) echo "{";
-		else echo ", {";
-		echo "'id': ".$row['id'].", 'operadora': '".$row['operadora']."', 'situacao': '".$row['situacao']."', 'usuario': '".$row['usuario']."', 'imei': '".$row['imei']."', 'setor': '".$row['setor']."', 'unidade': '".$row['unidade']."', 'id_chip': '".$row['id_chip']."' }";
-	}
-	
-	?>
-
-    ];
-      $scope.ordenar = function(x) {
-      	if($scope.myOrderBy == x) x = "-"+x;
-	    $scope.myOrderBy = x;
-	  }
-
-});
-
-
-$(function () {
-	$( "section" ).delegate( ".linhaResultado3", "click", function() {
-	    var id = $(this).data('cod');
-	    //alert("AQUI: "+id);
-		//$('#modens').html('Carregando...');
-		// Do an ajax request
-		$.ajax({
-		  url: "modem.php?id="+id
-		}).done(function(data) { // data what is sent back by the php page
-		  $('#modens').html(data); // display data
-		});
-
-	});
-
-	$('#adicionarModem').click(function() {
-
-		//$('#modens').html('Carregando...');
-		// Do an ajax request
-		$.ajax({
-		  url: "modem.php?id=novo"
-		}).done(function(data) { // data what is sent back by the php page
-		  $('#modens').html(data); // display data
-		});
-
-	});
-});
-
-angular.bootstrap('#modens', ['appModens']);
-	
-</script>
-
-
-
+	<?php include "sections/modens.tpl"; ?>
 </section>
-
-
 
 <section id="movimentos" ng-app="appMovimentos" ng-controller="myCtrlMovimentos">
-
-	<input placeholder="Pesquisa Rápida" name="pesquisarMovimentos" id="pesquisarMovimentos" type="text" ng-model="filtroMovimento"><a id="adicionarMovimento">Movimentar</a>
-
-	<h2>Consultar Movimentos</h2>
-
-	<div class="tituloResultados">
-		<a class="linkTitulo6 selecionado" ng-click="ordenar2('id');">ID</a><a class="linkTitulo6" ng-click="ordenar2('diaHora');">Dia e Hora</a><a  class="linkTitulo6" ng-click="ordenar2('tipo_item');">Tipo</a><a  class="linkTitulo6" ng-click="ordenar2('id_item');">Item</a><a  class="linkTitulo6" ng-click="ordenar2('direcao');">Direção</a><a  class="linkTitulo6" ng-click="ordenar2('usuario');">Responsável</a>
-	</div>
-
-	<a data-cod="{{y.id}}"  class="linhaResultado6 {{y.situacao}" ng-repeat="y in records.sort | orderBy:myOrderBy2 | filter: filtroMovimento">
-		<div class="colunaResultado">{{y.id}}</div><div class="colunaResultado">{{y.diaHora}}</div><div class="colunaResultado">{{y.tipo_item}}</div><div class="colunaResultado">{{y.id_item}}</div><div class="colunaResultado">{{y.direcao}}</div><div class="colunaResultado">{{y.usuario}}</div>
-	</a>
-
-	<script>
-
-	$(function() {
-		$('.linkTitulo6').click(function() {
-			var elementos = document.getElementsByClassName('linkTitulo6');
-
-		for (var x = 0; x < elementos.length; x++) {
-			elementos[x].className = "linkTitulo6";
-		}
-
-		this.className = "linkTitulo6 selecionado";
-
-		});
-	});
-
-	var appMovimentos = angular.module("appMovimentos", [])
-	.controller("myCtrlMovimentos", function($scope) {
-    
-    $scope.records = { "sort" : [
-
-	<?php
-
-	$sql = "SELECT * FROM relatorios_movimentos ORDER BY id DESC";
-	$res = mysql_query($sql, $con);
-	$num = mysql_num_rows($res);
-
-	for($i = 0; $i < $num; $i++) {
-	$row = mysql_fetch_array($res);
-		if($i == 0) echo "{";
-		else echo ", {";
-		echo "'diaHora': '".$row['data']."', 'direcao': '".$row['direcao']."', 'id': ".$row['id'].", 'usuario': '".$row['usuario']."', 'tipo_item': '".$row['tipo_item']."', 'id_item': ".$row['id_item']." }";
-	}
-	
-	?>
-
-    ] }
-
-      $scope.ordenar2 = function(y) {
-      	if($scope.myOrderBy2 == y) y = "-"+y;
-	    $scope.myOrderBy2 = y;
-	  }
-});
-
-
-
-
-$(function () {
-	$('#adicionarMovimento').click(function() {
-
-		//$('#movimentos').html('Carregando...');
-		// Do an ajax request
-		$.ajax({
-		  url: "movimento.php?id=novo"
-		}).done(function(data) { // data what is sent back by the php page
-		  $('#movimentos').html(data); // display data
-		});
-
-	});
-});
-
-angular.bootstrap('#movimentos', ['appMovimentos']);
-
-</script>
-
+	<?php include "sections/movimentos.tpl"; ?>
 </section>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 <section id="historico" ng-app="appHistorico" ng-controller="myCtrlHistorico">
-	<h2>Consultar Histórico</h2>
-
-	<div class="tituloResultados">
-		<a class="linkTitulo2 selecionado" ng-click="ordenar2('diaHora');">Dia e Hora</a><a  class="linkTitulo2" ng-click="ordenar2('evento');">Evento</a><a  class="linkTitulo2" ng-click="ordenar2('descricao');">Descrição</a><a  class="linkTitulo2" ng-click="ordenar2('usuario');">Usuário</a>
-	</div>
-
-	<div class="linhaResultado" ng-repeat="y in records | orderBy:myOrderBy2">
-		<div class="colunaResultado2">{{y.diaHora}}</div><div class="colunaResultado2">{{y.evento}}</div><div class="colunaResultado2">{{y.descricao}}</div><div class="colunaResultado2">{{y.usuario}}</div>
-	</div>
-
-	<script>
-
-	$(function() {
-		$('.linkTitulo2').click(function() {
-			var elementos = document.getElementsByClassName('linkTitulo2');
-
-		for (var x = 0; x < elementos.length; x++) {
-			elementos[x].className = "linkTitulo2";
-		}
-
-		this.className = "linkTitulo2 selecionado";
-
-		});
-	});
-
-	var appHistorico = angular.module("appHistorico", [])
-	.controller("myCtrlHistorico", function($scope) {
-    
-    $scope.records = [
-
-	<?php
-
-	$sql = "SELECT relatorios_historico.id, relatorios_historico.nome, hora, descricao, relatorios_usuarios.nome AS usuario FROM relatorios_historico LEFT JOIN relatorios_usuarios ON relatorios_historico.id_usuario = relatorios_usuarios.id  WHERE sistema = 2 OR sistema = 0 ORDER BY relatorios_historico.id DESC";
-	$res = mysql_query($sql, $con);
-	$num = mysql_num_rows($res);
-
-	for($i = 0; $i < $num; $i++) {
-	$row = mysql_fetch_array($res);
-		if($i == 0) echo "{";
-		else echo ", {";
-		echo "'diaHora': '".$row['hora']."', 'evento': '".$row['nome']."', 'descricao': '".$row['descricao']."', 'usuario': '".$row['usuario']."' }";
-	}
-	
-	?>
-
-    ];
-      $scope.ordenar2 = function(y) {
-      	if($scope.myOrderBy2 == y) y = "-"+y;
-	    $scope.myOrderBy2 = y;
-	  }
-});
-
-angular.bootstrap('#historico', ['appHistorico']);
-
-</script>
-
+	<?php include "sections/historico.tpl"; ?>
 </section>
+
+<section id="perfis" ng-app="appPerfis" ng-controller="myCtrlPerfis">
+	<?php include "sections/perfil.tpl"; ?>
+</section>
+
+
 
 </main>
 

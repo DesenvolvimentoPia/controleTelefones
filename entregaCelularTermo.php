@@ -16,7 +16,7 @@ $PHPWord = new PHPWord();
 $section = $PHPWord->createSection();
 
 // After creating a section, you can append elements:
-$section->addText('N° 49/'.date("y"), array('name'=>'Tahoma', 'size'=>10, 'color'=>'999999'));
+$section->addText('N° '.$_GET['codigoMovimento'].'/'.date("y"), array('name'=>'Tahoma', 'size'=>10, 'color'=>'999999'));
 
 // You can directly style your text by giving the addText function an array:
 $PHPWord->addParagraphStyle('centralizar', array('align'=>'center', 'spaceAfter'=>430, 'spaceBefore'=>430));
@@ -79,3 +79,5 @@ $objWriter = PHPWord_IOFactory::createWriter($PHPWord, 'Word2007');
 $objWriter->save($nomeArquivo);
 
 header("location: ".$nomeArquivo);
+
+?>
