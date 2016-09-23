@@ -7,10 +7,10 @@ include "../conexao.php";
 <a href="./" id="botaoVoltar">Voltar</a>
 
 <section class="aparelho">
-	<h2>Adicionar Modem</h2>
+	<h2>Adicionar Movimentos</h2>
 
 	<form id="editarAparelho" action="./" method="post">
-	<input type="hidden" name="hiddenNovoModem" value="true">
+	<input type="hidden" name="hiddenNovoMovimentos" value="true">
 
 	<input placeholder="Operadora" type="text" name="inputOperadora" id="inputOperadora" required><span>*</span>
 	<input placeholder="IMEI" type="text" name="inputImei" id="inputImei" required><span>*</span>
@@ -34,7 +34,7 @@ include "../conexao.php";
 		<?php } ?>
 	</select>
 
-	<input type="submit" name="enviar" >
+	<input type="submit" name="enviar">
 
 	</form>
 </section>

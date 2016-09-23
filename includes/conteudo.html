@@ -7,6 +7,27 @@ include "../conexao.php";
 
 
 
+/* Trecho Responsável pela adição de um Modem no Banco de Dados */
+
+if(!empty($_POST['hiddenNovoMovimento'])) {
+	$sql = "INSERT INTO relatorios_movimentos VALUES ('', '".$_POST['inputTipoItem']."', '".$_POST['inputIdItem']."', '".$_POST['inputDirecao']."', '".$_POST['inputTipoUsuario']."', '".$_POST['inputUsuario']."', '".date("Y-m-d H:i:s")."', '".$_POST['inputSituacao']."', '".$_POST['inputDescricao']."')";
+	$res = mysql_query($sql, $con);
+
+	$sql1 = "INSERT INTO relatorios_historico VALUES ('', 'Movimento Adicionado', '".date("Y-m-d H:i:s")."', 'Um Novo Movimento foi Adicionado com Sucesso.', '".$_SESSION['userId']."', '2')";
+	$res1= mysql_query($sql1, $con);
+
+	$resultado = "Movimento Inserido com Sucesso!";
+}
+
+
+
+
+
+
+
+
+
+
 /* Trecho Responsável pela edição de um Chip no Banco de Dados */
 
 if(!empty($_POST['hiddenChip'])) {
@@ -188,6 +209,7 @@ $(function(){
 		<a href="#chips" class="acao">Chips</a>
 		<a href="#linhas" class="acao">Linhas</a>
 		<a href="#modens" class="acao">Modens</a>
+		<a href="#movimentos" class="acao">Movimentos</a>
 		<a href="#historico" class="acao">Histórico</a>
 		<a href="../">Voltar</a>
 	</nav>
@@ -197,6 +219,14 @@ $(function(){
 <section id="home">
 	<p>Olá, <strong><?=$_SESSION['nome']?></strong>. Use o Menu Superior para Navegar.</p>
 </section>
+
+
+
+
+
+
+
+
 
 
 
@@ -586,6 +616,100 @@ angular.bootstrap('#modens', ['appModens']);
 
 
 
+<section id="movimentos" ng-app="appMovimentos" ng-controller="myCtrlMovimentos">
+
+	<input placeholder="Pesquisa Rápida" name="pesquisarMovimentos" id="pesquisarMovimentos" type="text" ng-model="filtroMovimento"><a id="adicionarMovimento">Movimentar</a>
+
+	<h2>Consultar Movimentos</h2>
+
+	<div class="tituloResultados">
+		<a class="linkTitulo6 selecionado" ng-click="ordenar2('id');">ID</a><a class="linkTitulo6" ng-click="ordenar2('diaHora');">Dia e Hora</a><a  class="linkTitulo6" ng-click="ordenar2('tipo_item');">Tipo</a><a  class="linkTitulo6" ng-click="ordenar2('id_item');">Item</a><a  class="linkTitulo6" ng-click="ordenar2('direcao');">Direção</a><a  class="linkTitulo6" ng-click="ordenar2('usuario');">Responsável</a>
+	</div>
+
+	<a data-cod="{{y.id}}"  class="linhaResultado6 {{y.situacao}" ng-repeat="y in records.sort | orderBy:myOrderBy2 | filter: filtroMovimento">
+		<div class="colunaResultado">{{y.id}}</div><div class="colunaResultado">{{y.diaHora}}</div><div class="colunaResultado">{{y.tipo_item}}</div><div class="colunaResultado">{{y.id_item}}</div><div class="colunaResultado">{{y.direcao}}</div><div class="colunaResultado">{{y.usuario}}</div>
+	</a>
+
+	<script>
+
+	$(function() {
+		$('.linkTitulo6').click(function() {
+			var elementos = document.getElementsByClassName('linkTitulo6');
+
+		for (var x = 0; x < elementos.length; x++) {
+			elementos[x].className = "linkTitulo6";
+		}
+
+		this.className = "linkTitulo6 selecionado";
+
+		});
+	});
+
+	var appMovimentos = angular.module("appMovimentos", [])
+	.controller("myCtrlMovimentos", function($scope) {
+    
+    $scope.records = { "sort" : [
+
+	<?php
+
+	$sql = "SELECT * FROM relatorios_movimentos ORDER BY id DESC";
+	$res = mysql_query($sql, $con);
+	$num = mysql_num_rows($res);
+
+	for($i = 0; $i < $num; $i++) {
+	$row = mysql_fetch_array($res);
+		if($i == 0) echo "{";
+		else echo ", {";
+		echo "'diaHora': '".$row['data']."', 'direcao': '".$row['direcao']."', 'id': ".$row['id'].", 'usuario': '".$row['usuario']."', 'tipo_item': '".$row['tipo_item']."', 'id_item': ".$row['id_item']." }";
+	}
+	
+	?>
+
+    ] }
+
+      $scope.ordenar2 = function(y) {
+      	if($scope.myOrderBy2 == y) y = "-"+y;
+	    $scope.myOrderBy2 = y;
+	  }
+});
+
+
+
+
+$(function () {
+	$('#adicionarMovimento').click(function() {
+
+		//$('#movimentos').html('Carregando...');
+		// Do an ajax request
+		$.ajax({
+		  url: "movimento.php?id=novo"
+		}).done(function(data) { // data what is sent back by the php page
+		  $('#movimentos').html(data); // display data
+		});
+
+	});
+});
+
+angular.bootstrap('#movimentos', ['appMovimentos']);
+
+</script>
+
+</section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <section id="historico" ng-app="appHistorico" ng-controller="myCtrlHistorico">
 	<h2>Consultar Histórico</h2>
 
@@ -634,7 +758,7 @@ angular.bootstrap('#modens', ['appModens']);
 
     ];
       $scope.ordenar2 = function(y) {
-      	if($scope.myOrderBy == y) y = "-"+y;
+      	if($scope.myOrderBy2 == y) y = "-"+y;
 	    $scope.myOrderBy2 = y;
 	  }
 });
