@@ -176,7 +176,7 @@ h2 {
     padding: 16px 0;
 }
 
-#telefones, #chips, #linhas, #modens, #historico, #movimentos {
+#telefones, #chips, #linhas, #modens, #historico, #movimentos, #perfis {
 	display: none;
 }
 
@@ -562,4 +562,30 @@ a.nmn.selecionado {
         url('../../fontes/champagne__limousines-webfont.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@media screen and (max-width: 1240px) {
+    main {
+        width: 100%;
+        max-width: 1420px;
+        margin: 0 auto;
+    }
+    nav a {
+        padding: 16px 25px;
+    }
 }
