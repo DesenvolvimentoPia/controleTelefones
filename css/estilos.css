@@ -589,3 +589,29 @@ a.nmn.selecionado {
         padding: 16px 25px;
     }
 }
+
+
+a#backToTop {
+    width: 52px;
+    padding: 34px 0 6px;
+    position: fixed;
+    bottom: 34px;
+    right: 25px;
+    text-align: center;
+    background: #CCC;
+    color: #FFF;
+    font-size: 61px;
+    font-family: "Champagne & Limousines", 'Champagne';
+    cursor: pointer;
+    line-height: 10px;
+    transition: all 0.43s;
+    -o-transition: all 0.43s;
+    -moz-transition: all 0.43s;
+    -webkit-transition: all 0.43s;
+    display: none;
+}
+
+
+a#backToTop:hover {
+    background: #5da2F6;
+}
