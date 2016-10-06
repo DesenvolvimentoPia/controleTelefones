@@ -135,7 +135,7 @@ h1 {
 }
 
 nav a {
-    padding: 16px 30px;
+    padding: 16px 22px;
     display: inline-block;
     color: #FFF;
     font-family: "Champagne & Limousines", 'Champagne';
@@ -176,7 +176,7 @@ h2 {
     padding: 16px 0;
 }
 
-#telefones, #chips, #linhas, #modens, #historico, #movimentos, #perfis {
+#telefones, #chips, #linhas, #modens, #historico, #movimentos, #perfis, #notebooks {
 	display: none;
 }
 
@@ -229,7 +229,7 @@ a.acao.selecionado {
     border-color: #38C;
 }
 
-.linhaResultado, .linhaResultado3, .linhaResultado4, .linhaResultado5, .linhaResultado6 {
+.linhaResultado, .linhaResultado3, .linhaResultado4, .linhaResultado5, .linhaResultado6, .linhaResultado7 {
     display: block;
     padding: 12px 2%;
     width: 86%;
@@ -237,7 +237,7 @@ a.acao.selecionado {
     text-align: center;
 }
 
-.linhaResultado:nth-child(odd), .linhaResultado3:nth-child(odd), .linhaResultado4:nth-child(odd), .linhaResultado5:nth-child(odd), .linhaResultado6:nth-child(odd) {
+.linhaResultado:nth-child(odd), .linhaResultado3:nth-child(odd), .linhaResultado4:nth-child(odd), .linhaResultado5:nth-child(odd), .linhaResultado6:nth-child(odd), .linhaResultado7:nth-child(odd) {
 	background: #CCC;
 }
 
@@ -318,7 +318,7 @@ a.linkTitulo2 {
     width: 25%;
 }
 
-.linhaResultado:hover, .linhaResultado3:hover, .linhaResultado4:hover, .linhaResultado5:hover, .linhaResultado6:hover {
+.linhaResultado:hover, .linhaResultado3:hover, .linhaResultado4:hover, .linhaResultado5:hover, .linhaResultado6, .linhaResultado7:hover {
     background: #578fce;
     color: #FFF;
     cursor: pointer;
@@ -415,7 +415,7 @@ div#resultadoSql {
     left: 25%;
 }
 
-input#pesquisarAparelhos, input#pesquisarModens, input#pesquisarLinhas, input#pesquisarChips, input#pesquisarMovimentos {
+input#pesquisarAparelhos, input#pesquisarModens, input#pesquisarLinhas, input#pesquisarChips, input#pesquisarNotebooks, input#pesquisarMovimentos {
     margin: 10px 0;
     width: 60%;
     padding: 16px;
@@ -430,13 +430,13 @@ input#pesquisarAparelhos, input#pesquisarModens, input#pesquisarLinhas, input#pe
     -webkit-transition: all 0.43s;
 }
 
-input#pesquisarAparelhos:focus, input#pesquisarModens:focus, input#pesquisarLinhas:focus, input#pesquisarMovimentos:focus, input#pesquisarChips:focus {
+input#pesquisarAparelhos:focus, input#pesquisarModens:focus, input#pesquisarLinhas:focus, input#pesquisarMovimentos:focus, input#pesquisarNotebooks:focus, input#pesquisarChips:focus {
     border: #222 1px solid;
     background: #525252;
     color: #DDD;
 }
 
-a#adicionarAparelho, a#adicionarModem, a#adicionarLinha, a#adicionarChip, a#adicionarMovimento {
+a#adicionarAparelho, a#adicionarModem, a#adicionarLinha, a#adicionarChip, a#adicionarNotebook, a#adicionarMovimento {
     width: 27%;
     padding: 18px 1%;
     background: #999;
@@ -454,7 +454,7 @@ a#adicionarAparelho, a#adicionarModem, a#adicionarLinha, a#adicionarChip, a#adic
     -webkit-transition: all 0.43s;
 }
 
-a#adicionarAparelho:hover, a#botaoVoltar:hover, a#adicionarModem:hover, a#adicionarLinha:hover, a#adicionarChip:hover, a#adicionarMovimento:hover {
+a#adicionarAparelho:hover, a#botaoVoltar:hover, a#adicionarModem:hover, a#adicionarLinha:hover, a#adicionarChip:hover, a#adicionarNotebook:hover, a#adicionarMovimento:hover {
     background: #578fce;
 }
 
@@ -586,7 +586,7 @@ a.nmn.selecionado {
         margin: 0 auto;
     }
     nav a {
-        padding: 16px 25px;
+        padding: 16px 20px;
     }
 }
 
