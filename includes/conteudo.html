@@ -238,10 +238,11 @@ $(function(){
 <div id="resultadoSql"><?=$resultado;?></div>
 <?php } ?>
 
+
 <main>
-	
+
 <header>
-	<h1><img src="../img/logo2.png" id="logoInterno">Controle de Equipamentos - PIÁ</h1>
+	<h1><img src="../img/logo2.png" id="logoInterno">Gestão de Telefonia - PIÁ</h1>
 
 	<nav>
 		<a href="#home" class="acao selecionado">Home</a>
@@ -249,15 +250,13 @@ $(function(){
 		<a href="#chips" class="acao">Chips</a>
 		<a href="#linhas" class="acao">Linhas</a>
 		<a href="#modens" class="acao">Modens</a>
-		<a href="#notebooks" class="acao">Notebooks</a>
 		<a href="#movimentos" class="acao">Movimentos</a>
-		<a href="#perfis" class="acao">Perfis</a>
 		<a href="#historico" class="acao">Histórico</a>
 		<a href="../">Voltar</a>
 	</nav>
 
 </header>
-
+	
 <section id="home">
 	<?php include "sections/home.tpl"; ?>
 </section>
@@ -278,10 +277,6 @@ $(function(){
 	<?php include "sections/modens.tpl"; ?>
 </section>
 
-<section id="notebooks" ng-app="appNotebooks" ng-controller="myCtrlNotebooks">
-	<?php include "sections/notebooks.tpl"; ?>
-</section>
-
 <section id="movimentos" ng-app="appMovimentos" ng-controller="myCtrlMovimentos">
 	<?php include "sections/movimentos.tpl"; ?>
 </section>
@@ -289,11 +284,6 @@ $(function(){
 <section id="historico" ng-app="appHistorico" ng-controller="myCtrlHistorico">
 	<?php include "sections/historico.tpl"; ?>
 </section>
-
-<section id="perfis" ng-app="appPerfis" ng-controller="myCtrlPerfis">
-	<?php include "sections/perfil.tpl"; ?>
-</section>
-
 
 <a id="backToTop">^</a>
 
