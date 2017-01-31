@@ -1,47 +1,155 @@
 <?php
 // Arquivo de Corpo
 
-include "../conexao.php";
+include "../sisti/conexao.php";
 
 ?>
 
-<a href="./" id="botaoVoltar">Voltar</a>
-
 <section class="aparelho">
-	<h2>Adicionar Aparelho</h2>
+	<h1>Adicionar Aparelho</h1>
 
 	<form id="editarAparelho" action="./" method="post">
 	<input type="hidden" name="hiddenNovoAparelho" value="true">
 
-	<input placeholder="Marca" type="text" name="inputMarca" id="inputMarca" required><span>*</span>
+	<select name="inputMarca" id="inputMarca" required>
+		<option value="" selected disabled>Marca</option>
+		<option value="Alcatel">Alcatel</option>
+		<option value="Apple">Apple</option>
+		<option value="Blackberry">Blackberry</option>
+		<option value="LeNovo">LeNovo</option>
+		<option value="LG">LG</option>
+		<option value="Motorola">Motorola</option>
+		<option value="Nokia">Nokia</option>
+		<option value="Samsung">Samsung</option>
+		<option value="Siemens">Siemens</option>
+		<option value="Sony Ericsson">Sony Ericsson</option>
+	</select><span>*</span>
+
 	<input placeholder="Modelo" type="text" name="inputModelo" id="inputModelo" required><span>*</span>
 	<input placeholder="IMEI" type="text" name="inputImei" id="inputImei" required><span>*</span>
 	<input placeholder="PIN" type="text" name="inputPin" id="inputPin">
-	<input placeholder="Situação" type="text" name="inputSituacao" id="inputSituacao" required><span>*</span>
-	<input placeholder="Usuário" type="text" name="inputUsuario" id="inputUsuario">
-	<input placeholder="Matrícula" type="text" name="inputMatriculaUsuario" id="inputMatriculaUsuario">
-	<input placeholder="Setor" type="text" name="inputSetor" id="inputSetor">
-	<input placeholder="Unidade" type="text" name="inputUnidade" id="inputUnidade">
+	<select name="inputSituacao" id="inputSituacao" required>
+		<option value="" selected disabled>Situação</option>
+		<option value="Entregue">Entregue</option>
+		<option value="Estoque">Estoque</option>
+		<option value="Manutenção">Manutenção</option>
+	</select><span>*</span>
 
-	<textarea placeholder="Problema" type="text" name="inputProblema" id="inputProblema"></textarea>
+	<select name="inputSistemaOperacional" id="inputSistemaOperacional" required>
+		<option value="" selected disabled>Sistema Operacional</option>
+		<option value="Android">Android</option>
+		<option value="IOS">IOS</option>
+		<option value="Outros">Outros</option>
+	</select><span>*</span>
 
-	<select name="inputChip" id="inputChip">
-		<option value="0" selected>Sem Chip</option>
-		<?php
-		$sqlChip = "SELECT * FROM relatorios_chips ORDER BY id";
-		$resChip = mysql_query($sqlChip, $con);
-		$numChip = mysql_num_rows($resChip);
 
-		for($x = 0; $x < $numChip; $x++) {
-			$rowChip = mysql_fetch_array($resChip);
-		?>		
-		<option value="<?=$rowChip['id']?>"><?="Chip ".$rowChip['id']." - ".$rowChip['numero']?></option>
-		<?php } ?>
-	</select>
+	<input placeholder="Versão do Sistema Operacional" type="text" name="inputVersaoSO" id="inputVersaoSO">
+	<input placeholder="Número de Série" type="text" name="inputNumeroSerie" id="inputNumeroSerie">
+
+	<input type="hidden" name="inputMatriculaUsuario" id="inputMatriculaUsuario">
+	<input onkeyup="checkPesquisa()" onblur="fechaDinamico()" autocomplete="off" placeholder="Usuário" type="text" name="inputUsuario" id="inputUsuario">
+	<div id="resultadoAjax"></div>
+	
+	
+
+	<textarea placeholder="Observações" type="text" name="inputProblema" id="inputProblema"></textarea>
+
+	
+
+	<input name="inputChipOculto" id="inputChipOculto" required type="hidden">
+	<input data-tipo="telefones" onkeyup="checkPesquisa2()" onblur="fechaDinamico2()" name="inputChip" id="inputChip" required placeholder="Chip"><span>*</span>
+	<div id="resultadoAjax2"></div>
+
+	<input placeholder="ID do MDM" type="text" name="inputIdMDM" id="inputIdMDM">
+
+	<h5>Acessórios</h5>
+
+	<label class="acessorios">Capinha: <input type="radio" name="radioCapinha" checked value="1"> SIM 
+	<input type="radio" name="radioCapinha" value="0"> NÃO</label>
+
+	<label class="acessorios">Película: <input type="radio" name="radioPelicula" checked value="1"> SIM 
+	<input type="radio" name="radioPelicula" value="0"> NÃO</label>
+
+	<label class="acessorios">Carregador: <input type="radio" name="radioCarregador" checked value="1"> SIM 
+	<input type="radio" name="radioCarregador" value="0"> NÃO</label>
+
+	<label class="acessorios">Cabo de Dados: <input type="radio" name="radioCabo" checked value="1"> SIM 
+	<input type="radio" name="radioCabo" value="0"> NÃO</label>
+
+	<label style="margin-bottom: 20px" class="acessorios">Fone de Ouvido: <input type="radio" name="radioFone" checked value="1"> SIM 
+	<input type="radio" name="radioFone" value="0"> NÃO</label>
+
+
 
 	<input type="submit" name="enviar" >
 
 	</form>
 </section>
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<script type="text/javascript">
 
+var botaoPesquisa;
+
+function checkPesquisa() {
+	if(botaoPesquisa != document.getElementById("inputUsuario").value.toLowerCase()) {
+	    botaoPesquisa = document.getElementById("inputUsuario").value.toLowerCase();
+
+		if(botaoPesquisa.length > 3) {
+	        //alert("AQUI");
+	        
+	        $("#resultadoAjax").fadeIn();
+	        $("#resultadoAjax").html('<div class="spinner"><div class="rect1"></div><div class="rect2"></div><div class="rect3"></div><div class="rect4"></div><div class="rect5"></div></div>');
+
+	                // Faz requisição ajax e envia o ID da Categoria via método POST
+	            $.post("private/usuarios.php", {usu: botaoPesquisa}, function(resposta) {
+
+	               // Coloca a resposta na DIV
+	               setTimeout(function() { $("#resultadoAjax").html(resposta); }, 700);
+	           
+	            });
+
+	    }
+
+	    if(botaoPesquisa.length <= 3) $("#resultadoAjax").fadeOut();
+	}
+}
+
+function fechaDinamico() {
+	$("#resultadoAjax").fadeOut();	
+	setTimeout(function() { if (document.getElementById('inputMatriculaUsuario').value == '') document.getElementById('inputUsuario').value = ''; }, 350);
+}
+
+
+
+var botaoPesquisa2;
+
+function checkPesquisa2() {
+	if(botaoPesquisa2 != document.getElementById("inputChip").value) {
+	    botaoPesquisa2 = document.getElementById("inputChip").value;
+
+		if(botaoPesquisa2.length > 2) {
+	        
+	        $("#resultadoAjax2").fadeIn();
+	        $("#resultadoAjax2").html('<div class="spinner"><div class="rect1"></div><div class="rect2"></div><div class="rect3"></div><div class="rect4"></div><div class="rect5"></div></div>');
+
+	                // Faz requisição ajax e envia o ID da Categoria via método POST
+	            $.post("private/chips.php", {usu: botaoPesquisa2}, function(resposta) {
+
+	               // Coloca a resposta na DIV
+	               setTimeout(function() { $("#resultadoAjax2").html(resposta); }, 700);
+	           
+	            });
+
+	    }
+
+	    if(botaoPesquisa2.length <= 2) $("#resultadoAjax2").fadeOut();
+	}
+}
+
+function fechaDinamico2() {
+	$("#resultadoAjax2").fadeOut();	
+	setTimeout(function() { if (document.getElementById('inputChipOculto').value == '') document.getElementById('inputChip').value = ''; }, 350);
+}
+
+</script>

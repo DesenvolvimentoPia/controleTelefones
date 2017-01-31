@@ -2,25 +2,28 @@
 
 // Arquivo de Corpo
 
-include "../conexao.php";
+include "../sisti/conexao.php";
 
 $sqlAparelho = "SELECT * FROM relatorios_chips WHERE id=".$_GET['id'];
-$resAparelho = mysql_query($sqlAparelho, $con);
-$rowAparelho = mysql_fetch_array($resAparelho);
+$resAparelho = sqlsrv_query($con, $sqlAparelho);
+$rowAparelho = sqlsrv_fetch_array($resAparelho);
 
 ?>
 
-<a href="./" id="botaoVoltar">Voltar</a>
-
 
 <section class="aparelho">
-	<h2>Editar Chip - <?=$rowAparelho['id']?></h2>
+	<h1>Editar Chip - <?=$rowAparelho['id']?></h1>
 
 	<form id="editarAparelho" action="./" method="post">
 	<input type="hidden" name="hiddenChip" value="<?=$rowAparelho['id']?>">
 
-	<input value="<?=$rowAparelho['numero']?>" placeholder="Número" type="text" name="inputNumero" id="inputNumero" required><span>*</span>
-	<input value="<?=$rowAparelho['situacao']?>" placeholder="Situação" type="text" name="inputSituacao" id="inputSituacao" required><span>*</span>
+	<label class='labelEditar'>Número: <input value="<?=$rowAparelho['numero']?>" placeholder="Número" type="text" name="inputNumero" id="inputNumero" required><span>*</span></label>
+	
+	<label class='labelEditar'>Situação: <select placeholder="Situação" name="inputSituacao" id="inputSituacao" required>
+		<option <?php if($rowAparelho['situacao'] == 'Entregue') echo 'selected'; ?> value="Entregue">Entregue</option>
+		<option <?php if($rowAparelho['situacao'] == 'Estoque') echo 'selected'; ?> value="Estoque">Estoque</option>
+		<option <?php if($rowAparelho['situacao'] == 'Manutenção') echo 'selected'; ?> value="Manutenção">Manutenção</option>
+	</select><span>*</span></label>
 
 	<input value="<?=$rowAparelho['normal']?>" type="hidden" name="inputNormal" id="inputNormal">
 	<input value="<?=$rowAparelho['micro']?>" type="hidden" name="inputMicro" id="inputMicro">
@@ -28,20 +31,26 @@ $rowAparelho = mysql_fetch_array($resAparelho);
 
 	<a class="nmn <?php if($rowAparelho['normal'] == "X") echo "selecionado"; ?>" id="nmnNormal">Normal</a><a class="nmn <?php if($rowAparelho['micro'] == "X") echo "selecionado"; ?>" id="nmnMicro">Micro</a><a class="nmn <?php if($rowAparelho['nano'] == "X") echo "selecionado"; ?>" id="nmnNano">Nano</a>
 
-	<select name="inputLinha" id="inputLinha">
+	<label class='labelEditar'>Linha: <select name="inputLinha" id="inputLinha">
 		<option value="0" selected>Sem Linha</option>
 		<?php
 		$sqlLinha = "SELECT * FROM relatorios_linhas ORDER BY id";
-		$resLinha = mysql_query($sqlLinha, $con);
-		$numLinha = mysql_num_rows($resLinha);
+		$resLinha = sqlsrv_query($con, $sqlLinha);
+		$numLinha = sqlsrv_num_rows($resLinha);
 
-		for($x = 0; $x < $numLinha; $x++) {
-
-			$rowLinha = mysql_fetch_array($resLinha);
+		while($rowLinha = sqlsrv_fetch_array($resLinha)) {
 		?>		
-		<option <?php if($rowAparelho['id_linha'] == $rowLinha['id']) echo "selected"; ?> value="<?=$rowLinha['id']?>"><?=$rowLinha['numero']?></option>
+		<option <?php if($rowAparelho['id_linha'] == $rowLinha['numero']) echo "selected"; ?> value="<?=$rowLinha['numero']?>"><?=$rowLinha['numero']?></option>
 		<?php } ?>
-	</select>
+	</select></label>
+
+	<p id="nomeUsuario"><?php
+	$sqlUsuario = "SELECT * FROM relatorios_linhas WHERE numero LIKE '".$rowAparelho['id_linha']."'";
+	$resUsuario = sqlsrv_query($con, $sqlUsuario);
+	if($rowUsuario = sqlsrv_fetch_array($resUsuario)) echo "Usuário: ".$rowUsuario['nomeUsuario'];
+	else echo "Sem Usuário";
+
+	?></p>
 
 	<script>
 
@@ -63,6 +72,11 @@ $rowAparelho = mysql_fetch_array($resAparelho);
 	});
 
 	</script>
+
+
+	<label class='labelEditar'>Operadora: <input value="<?=$rowAparelho['operadora']?>" placeholder="Operadora" type="text" name="inputOperadora" id="inputOperadora"></label>
+	<label class='labelEditar'>E-mail: <input value="<?=$rowAparelho['email']?>" placeholder="E-mail Administrativo" type="text" name="inputEmail" id="inputEmail"></label>
+	<label class='labelEditar'>Senha: <input value="<?=$rowAparelho['senha']?>" placeholder="Senha" type="text" name="inputSenha" id="inputSenha"></label>
 
 	<input type="submit" name="enviar" value="Salvar">
 

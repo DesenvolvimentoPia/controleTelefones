@@ -1,9 +1,11 @@
-<h2>Lista de Linhas</h2>
+<div id="dinamicoLinhas" ng-app="appLinhas" ng-controller="myCtrlLinhas">
+
+<h1>Lista de Linhas</h1>
 
 	<input placeholder="Pesquisa Rápida" name="pesquisarLinhas" id="pesquisarLinhas" type="text" ng-model="filtroLinha"><a id="adicionarLinha">Adicionar</a>
 
 	<div class="tituloResultados">
-	<a  class="linkTitulo4 selecionado" ng-click="ordenar('id');">ID</a><a  class="linkTitulo4" ng-click="ordenar('numero');">Número</a><a  class="linkTitulo4" ng-click="ordenar('chip');">Chip</a><a  class="linkTitulo4" ng-click="ordenar('status');">Status</a>
+	<a  class="linkTitulo4 selecionado" ng-click="ordenar('id');">ID</a><a  class="linkTitulo4" ng-click="ordenar('numero');">Número</a><a  class="linkTitulo4" ng-click="ordenar('chip');">Usuário</a><a  class="linkTitulo4" ng-click="ordenar('status');">Status</a>
 	</div>
 
 	<a data-cod="{{x.id}}" class="linhaResultado4 {{x.situacao}}" title="{{x.situacao}}" ng-repeat="x in recordsLinhas | orderBy:myOrderBy | filter: filtroLinha">
@@ -32,15 +34,19 @@
 
 	<?php
 
-	$sql = "SELECT * FROM relatorios_linhas ORDER BY id DESC";
-	$res = mysql_query($sql, $con);
-	$num = mysql_num_rows($res);
+	if($_POST) include "../../sisti/conexao.php";
 
-	for($i = 0; $i < $num; $i++) {
-	$row = mysql_fetch_array($res);
+	$sql = "SELECT * FROM relatorios_linhas ORDER BY id DESC";
+	$res = sqlsrv_query($con, $sql);
+	$num = sqlsrv_num_rows($res);
+
+	$i = -1;
+while($row = sqlsrv_fetch_array($res)) {
+$i++;
+	
 		if($i == 0) echo "{";
 		else echo ", {";
-		echo "'id': ".$row['id'].", 'numero': '".$row['numero']."', 'situacao': '".$row['situacao']."', 'status': '".$row['status']."' }";
+		echo "'id': ".$row['id'].", 'numero': '".$row['numero']."', 'chip': '".$row['nomeUsuario']."', 'situacao': '".$row['situacao']."', 'status': '".$row['status']."' }";
 	}
 	
 	?>
@@ -70,17 +76,19 @@ $(function () {
 
 	$('#adicionarLinha').click(function() {
 
-		//$('#linhas').html('Carregando...');
+		$("#linhas").html('<div class="spinner nofloat"><div class="rect1"></div><div class="rect2"></div><div class="rect3"></div><div class="rect4"></div><div class="rect5"></div></div>');
 		// Do an ajax request
 		$.ajax({
 		  url: "linha.php?id=novo"
 		}).done(function(data) { // data what is sent back by the php page
-		  $('#linhas').html(data); // display data
+		  setTimeout( function() { $('#linhas').html(data); }, 340); // display data
 		});
 
 	});
 });
 
-angular.bootstrap('#linhas', ['appLinhas']);
+angular.bootstrap('#dinamicoLinhas', ['appLinhas']);
 	
 </script>
+
+</div>

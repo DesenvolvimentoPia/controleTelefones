@@ -2,26 +2,38 @@
 
 // Arquivo de Corpo
 
-include "../conexao.php";
+include "../sisti/conexao.php";
 
 $sqlAparelho = "SELECT * FROM relatorios_linhas WHERE id=".$_GET['id'];
-$resAparelho = mysql_query($sqlAparelho, $con);
-$rowAparelho = mysql_fetch_array($resAparelho);
+$resAparelho = sqlsrv_query($con, $sqlAparelho);
+$rowAparelho = sqlsrv_fetch_array($resAparelho);
 
 ?>
 
-<a href="./" id="botaoVoltar">Voltar</a>
-
 
 <section class="aparelho">
-	<h2>Editar Linha - <?=$rowAparelho['id']?></h2>
+	<h1>Editar Linha - <?=$rowAparelho['id']?></h1>
 
 	<form id="editarAparelho" action="./" method="post">
 	<input type="hidden" name="hiddenLinha" value="<?=$rowAparelho['id']?>">
 
-	<input value="<?=$rowAparelho['numero']?>" placeholder="Número" type="text" name="inputNumero" id="inputNumero" required><span>*</span>
-	<input value="<?=$rowAparelho['situacao']?>" placeholder="Situação" type="text" name="inputSituacao" id="inputSituacao" required><span>*</span>
-	<input value="<?=$rowAparelho['status']?>" placeholder="Status" type="text" name="inputStatus" id="inputStatus">
+	<label class='labelEditar'>Número: <input value="<?=$rowAparelho['numero']?>" placeholder="Número" type="text" name="inputNumero" id="inputNumero" required><span>*</span></label>
+	
+	<label class='labelEditar'>Situação: <select placeholder="Situação" name="inputSituacao" id="inputSituacao" required>
+		<option <?php if($rowAparelho['situacao'] == 'Entregue') echo 'selected'; ?> value="Entregue">Entregue</option>
+		<option <?php if($rowAparelho['situacao'] == 'Estoque') echo 'selected'; ?> value="Estoque">Estoque</option>
+		<option <?php if($rowAparelho['situacao'] == 'Manutenção') echo 'selected'; ?> value="Manutenção">Manutenção</option>
+	</select><span>*</span></label>
+	
+	<label class='labelEditar'>Status: <input value="<?=$rowAparelho['status']?>" placeholder="Status" type="text" name="inputStatus" id="inputStatus"></label>
+
+	<label class='labelEditar'>Cota de Internet (em MB): <input value="<?=$rowAparelho['cota']?>" placeholder="Cota de Internet (em MB)" type="text" name="inputCota" id="inputCota"></label>
+
+	<input value="<?=$rowAparelho['matricula']?>" type="hidden" name="inputMatriculaUsuario" id="inputMatriculaUsuario" required>
+	
+	<label class='labelEditar'>Usuário: <input onkeyup="checkPesquisa()" onblur="fechaDinamico()" value="<?=$rowAparelho['nomeUsuario']?>" autocomplete="off" placeholder="Usuário" type="text" name="inputUsuario" id="inputUsuario"></label>
+	
+	<div id="resultadoAjax"></div>
 
 	<input type="submit" name="enviar" value="Salvar">
 
@@ -29,3 +41,38 @@ $rowAparelho = mysql_fetch_array($resAparelho);
 </section>
 
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<script type="text/javascript">
+
+var botaoPesquisa;
+
+function checkPesquisa() {
+	if(botaoPesquisa != document.getElementById("inputUsuario").value.toLowerCase()) {
+	    botaoPesquisa = document.getElementById("inputUsuario").value.toLowerCase();
+
+		if(botaoPesquisa.length > 3) {
+	        //alert("AQUI");
+	        
+	        $("#resultadoAjax").fadeIn();
+	        $("#resultadoAjax").html('<div class="spinner"><div class="rect1"></div><div class="rect2"></div><div class="rect3"></div><div class="rect4"></div><div class="rect5"></div></div>');
+
+	                // Faz requisição ajax e envia o ID da Categoria via método POST
+	            $.post("private/usuarios.php", {usu: botaoPesquisa}, function(resposta) {
+
+	               // Coloca a resposta na DIV
+	               setTimeout(function() { $("#resultadoAjax").html(resposta); }, 700);
+	           
+	            });
+
+	    }
+
+	    if(botaoPesquisa.length <= 3) $("#resultadoAjax").fadeOut();
+	}
+}
+
+function fechaDinamico() {
+	$("#resultadoAjax").fadeOut();	
+	setTimeout(function() { if (document.getElementById('inputMatriculaUsuario').value == '') document.getElementById('inputUsuario').value = ''; }, 350);
+}
+
+</script>

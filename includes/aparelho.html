@@ -2,49 +2,99 @@
 
 // Arquivo de Corpo
 
-include "../conexao.php";
+include "../sisti/conexao.php";
 
 $sqlAparelho = "SELECT * FROM relatorios_telefones WHERE id=".$_GET['id'];
-$resAparelho = mysql_query($sqlAparelho, $con);
-$rowAparelho = mysql_fetch_array($resAparelho);
+$resAparelho = sqlsrv_query($con, $sqlAparelho);
+$rowAparelho = sqlsrv_fetch_array($resAparelho);
 
 ?>
 
-<a href="./" id="botaoVoltar">Voltar</a>
-
 
 <section class="aparelho">
-	<h2>Editar Aparelho - <?=$rowAparelho['id']?></h2>
+	<h1>Editar Aparelho - <?=$rowAparelho['id']?></h1>
 
 	<form id="editarAparelho" action="./" method="post">
 	<input type="hidden" name="hiddenAparelho" value="<?=$rowAparelho['id']?>">
 
-	<input value="<?=$rowAparelho['marca']?>" placeholder="Marca" type="text" name="inputMarca" id="inputMarca" required><span>*</span>
-	<input value="<?=$rowAparelho['modelo']?>" placeholder="Modelo" type="text" name="inputModelo" id="inputModelo" required><span>*</span>
-	<input value="<?=$rowAparelho['imei']?>" placeholder="IMEI" type="text" name="inputImei" id="inputImei" required><span>*</span>
-	<input value="<?=$rowAparelho['pin']?>" placeholder="PIN" type="text" name="inputPin" id="inputPin">
-	<input value="<?=$rowAparelho['situacao']?>" placeholder="Situação" type="text" name="inputSituacao" id="inputSituacao" required><span>*</span>
-	<input value="<?=$rowAparelho['usuario']?>" placeholder="Usuário" type="text" name="inputUsuario" id="inputUsuario">
-	<input value="<?=$rowAparelho['matricula']?>" placeholder="Matrícula" type="text" name="inputMatriculaUsuario" id="inputMatriculaUsuario">
-	<input value="<?=$rowAparelho['setor']?>" placeholder="Setor" type="text" name="inputSetor" id="inputSetor">
-	<input value="<?=$rowAparelho['unidade']?>" placeholder="Unidade" type="text" name="inputUnidade" id="inputUnidade">
+	<label class='labelEditar'>Marca: <select name="inputMarca" id="inputMarca" required>
+		<option <?php if($rowAparelho['marca'] == "Alcatel") echo "selected"; ?> value="Alcatel">Alcatel</option>
+		<option <?php if($rowAparelho['marca'] == "Apple") echo "selected"; ?> value="Apple">Apple</option>
+		<option <?php if($rowAparelho['marca'] == "Blackberry") echo "selected"; ?> value="Blackberry">Blackberry</option>
+		<option <?php if($rowAparelho['marca'] == "LeNovo") echo "selected"; ?> value="LeNovo">LeNovo</option>
+		<option <?php if($rowAparelho['marca'] == "LG") echo "selected"; ?> value="LG">LG</option>
+		<option <?php if($rowAparelho['marca'] == "Motorola") echo "selected"; ?> value="Motorola">Motorola</option>
+		<option <?php if($rowAparelho['marca'] == "Nokia") echo "selected"; ?> value="Nokia">Nokia</option>
+		<option <?php if($rowAparelho['marca'] == "Samsung") echo "selected"; ?> value="Samsung">Samsung</option>
+		<option <?php if($rowAparelho['marca'] == "Siemens") echo "selected"; ?> value="Siemens">Siemens</option>
+		<option <?php if($rowAparelho['marca'] == "Sony Ericsson") echo "selected"; ?> value="Sony Ericsson">Sony Ericsson</option>
+	</select><span>*</span></label>
 
-	<select name="inputChip" id="inputChip">
-		<option value="0" selected>Sem Chip</option>
-		<?php
-		$sqlChip = "SELECT * FROM relatorios_chips ORDER BY id";
-		$resChip = mysql_query($sqlChip, $con);
-		$numChip = mysql_num_rows($resChip);
+	<label class='labelEditar'>Modelo: <input value="<?=$rowAparelho['modelo']?>" placeholder="Modelo" type="text" name="inputModelo" id="inputModelo" required><span>*</span></label>
 
-		for($x = 0; $x < $numChip; $x++) {
+	<label class='labelEditar'>IMEI: <input value="<?=$rowAparelho['imei']?>" placeholder="IMEI" type="text" name="inputImei" id="inputImei" required><span>*</span></label>
 
-			$rowChip = mysql_fetch_array($resChip);
-		?>		
-		<option <?php if($rowAparelho['id_chip'] == $rowChip['id']) echo "selected"; ?> value="<?=$rowChip['id']?>"><?="Chip ".$rowChip['id']." - ".$rowChip['numero']?></option>
-		<?php } ?>
-	</select>
+	<label class='labelEditar'>PIN: <input value="<?=$rowAparelho['pin']?>" placeholder="PIN" type="text" name="inputPin" id="inputPin"></label>
 
-	<textarea placeholder="Problema" type="text" name="inputProblema" id="inputProblema"><?=$rowAparelho['problema']?></textarea>
+	<label class='labelEditar'>Situação: <select placeholder="Situação" name="inputSituacao" id="inputSituacao" required>
+		<option <?php if($rowAparelho['situacao'] == 'Entregue') echo 'selected'; ?> value="Entregue">Entregue</option>
+		<option <?php if($rowAparelho['situacao'] == 'Estoque') echo 'selected'; ?> value="Estoque">Estoque</option>
+		<option <?php if($rowAparelho['situacao'] == 'Manutenção') echo 'selected'; ?> value="Manutenção">Manutenção</option>
+	</select><span>*</span></label>
+
+	<label class='labelEditar'>Sistema Operacional: <select name="inputSistemaOperacional" id="inputSistemaOperacional" required>
+		<option value="" selected disabled>Sistema Operacional</option>
+		<option <?php if($rowAparelho['SO'] == 'Android') echo 'selected'; ?> value="Android">Android</option>
+		<option <?php if($rowAparelho['SO'] == 'IOS') echo 'selected'; ?> value="IOS">IOS</option>
+		<option <?php if($rowAparelho['SO'] == 'Outros') echo 'selected'; ?> value="Outros">Outros</option>
+	</select><span>*</span></label>
+
+	<label class='labelEditar'>Versão do Sistema Operacional: <input value="<?=$rowAparelho['versaoSO']?>" placeholder="Versão do Sistema Operacional" type="text" name="inputVersaoSO" id="inputVersaoSO"></label>
+
+	<label class='labelEditar'>Número de Série: <input value="<?=$rowAparelho['numeroSerie']?>" placeholder="Número de Série" type="text" name="inputNumeroSerie" id="inputNumeroSerie"></label>
+
+	<input value="<?=$rowAparelho['matricula']?>" type="hidden" name="inputMatriculaUsuario" id="inputMatriculaUsuario">
+	<label class='labelEditar'>Usuário: <input onkeyup="checkPesquisa()" onblur="fechaDinamico()" value="<?=$rowAparelho['usuario']?>" autocomplete="off" placeholder="Usuário" type="text" name="inputUsuario" id="inputUsuario"></label>
+	
+	<div id="resultadoAjax"></div>
+
+	<?php
+	$sqlChip = "SELECT * FROM relatorios_chips WHERE id = ".$rowAparelho['id_chip'];
+	$resChip = sqlsrv_query($con, $sqlChip);
+	$rowChip = sqlsrv_fetch_array($resChip);
+	if(!empty($rowAparelho['id_chip'])) $chip = $rowChip['id']." - ".$rowChip['numero'];
+	else $chip = "";
+	?>
+
+	<label class='labelEditar'>Chip: <input name="inputChipOculto" value="<?=$rowChip['id']?>" id="inputChipOculto" required type="hidden">
+	<input value="<?=$chip?>" data-tipo="telefones" onkeyup="checkPesquisa2()" onblur="fechaDinamico2()" name="inputChip" id="inputChip" required placeholder="Chip"><span>*</span>
+	<div id="resultadoAjax2"></div></label>
+
+	<label class='labelEditar'>Observações: <textarea placeholder="Observações" type="text" name="inputProblema" id="inputProblema"><?=$rowAparelho['problema']?></textarea></label>
+	
+	<label class='labelEditar'>ID do MDM: <input value="<?=$rowAparelho['idMDM']?>" placeholder="ID do MDM" type="text" name="inputIdMDM" id="inputIdMDM"></label>
+
+	<h5>Acessórios</h5>
+
+	<label class="acessorios">Capinha: 
+	<input type="radio" name="radioCapinha" <?php if($rowAparelho['acessoriosCapinha'] == 1) echo 'checked'; ?> value="1"> SIM 
+	<input type="radio" name="radioCapinha" <?php if($rowAparelho['acessoriosCapinha'] == 0) echo 'checked'; ?> value="0"> NÃO</label>
+
+	<label class="acessorios">Película: 
+	<input type="radio" name="radioPelicula" <?php if($rowAparelho['acessoriosPelicula'] == 1) echo 'checked'; ?> value="1"> SIM 
+	<input type="radio" name="radioPelicula" <?php if($rowAparelho['acessoriosPelicula'] == 0) echo 'checked'; ?> value="0"> NÃO</label>
+
+	<label class="acessorios">Carregador: 
+	<input type="radio" name="radioCarregador" <?php if($rowAparelho['acessoriosCarregador'] == 1) echo 'checked'; ?> value="1"> SIM 
+	<input type="radio" name="radioCarregador" <?php if($rowAparelho['acessoriosCarregador'] == 0) echo 'checked'; ?> value="0"> NÃO</label>
+
+	<label class="acessorios">Cabo de Dados: 
+	<input type="radio" name="radioCabo" <?php if($rowAparelho['acessoriosCabo'] == 1) echo 'checked'; ?> value="1"> SIM 
+	<input type="radio" name="radioCabo" <?php if($rowAparelho['acessoriosCabo'] == 0) echo 'checked'; ?> value="0"> NÃO</label>
+
+	<label style="margin-bottom: 20px" class="acessorios">Fone de Ouvido: 
+	<input type="radio" name="radioFone" <?php if($rowAparelho['acessoriosFone'] == 1) echo 'checked'; ?> value="1"> SIM 
+	<input type="radio" name="radioFone" <?php if($rowAparelho['acessoriosFone'] == 0) echo 'checked'; ?> value="0"> NÃO</label>
 
 	<input type="submit" name="enviar" value="Salvar">
 
@@ -52,3 +102,82 @@ $rowAparelho = mysql_fetch_array($resAparelho);
 </section>
 
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<script type="text/javascript">
+
+var botaoPesquisa;
+
+function checkPesquisa() {
+	if(botaoPesquisa != document.getElementById("inputUsuario").value.toLowerCase()) {
+	    botaoPesquisa = document.getElementById("inputUsuario").value.toLowerCase();
+
+		if(botaoPesquisa.length > 3) {
+	        //alert("AQUI");
+	        
+	        $("#resultadoAjax").fadeIn();
+	        $("#resultadoAjax").html('<div class="spinner"><div class="rect1"></div><div class="rect2"></div><div class="rect3"></div><div class="rect4"></div><div class="rect5"></div></div>');
+
+	                // Faz requisição ajax e envia o ID da Categoria via método POST
+	            $.post("private/usuarios.php", {usu: botaoPesquisa}, function(resposta) {
+
+	               // Coloca a resposta na DIV
+	               setTimeout(function() { $("#resultadoAjax").html(resposta); }, 700);
+	           
+	            });
+
+	    }
+
+	    if(botaoPesquisa.length <= 3) $("#resultadoAjax").fadeOut();
+	}
+}
+
+function fechaDinamico() {
+	$("#resultadoAjax").fadeOut();	
+	setTimeout(function() { if (document.getElementById('inputMatriculaUsuario').value == '') document.getElementById('inputUsuario').value = ''; }, 350);
+}
+
+$("#botaoVoltar").click(function(){
+
+	var ultimo = '';
+	$("#telefones").html('<div class="spinner nofloat"><div class="rect1"></div><div class="rect2"></div><div class="rect3"></div><div class="rect4"></div><div class="rect5"></div></div>');
+    // Faz requisição ajax e envia o ID da Categoria via método POST
+    $.post("./sections/telefones.php", {ultimo: ultimo}, function(resposta) {
+
+       // Coloca a resposta na DIV
+       setTimeout(function() { $("#telefones").html(resposta); }, 700);
+   
+    });
+});
+
+
+var botaoPesquisa2;
+
+function checkPesquisa2() {
+	if(botaoPesquisa2 != document.getElementById("inputChip").value) {
+	    botaoPesquisa2 = document.getElementById("inputChip").value;
+
+		if(botaoPesquisa2.length > 2) {
+	        
+	        $("#resultadoAjax2").fadeIn();
+	        $("#resultadoAjax2").html('<div class="spinner"><div class="rect1"></div><div class="rect2"></div><div class="rect3"></div><div class="rect4"></div><div class="rect5"></div></div>');
+
+	                // Faz requisição ajax e envia o ID da Categoria via método POST
+	            $.post("private/chips.php", {usu: botaoPesquisa2}, function(resposta) {
+
+	               // Coloca a resposta na DIV
+	               setTimeout(function() { $("#resultadoAjax2").html(resposta); }, 700);
+	           
+	            });
+
+	    }
+
+	    if(botaoPesquisa2.length <= 2) $("#resultadoAjax2").fadeOut();
+	}
+}
+
+function fechaDinamico2() {
+	$("#resultadoAjax2").fadeOut();	
+	setTimeout(function() { if (document.getElementById('inputChipOculto').value == '') document.getElementById('inputChip').value = ''; }, 350);
+}
+
+</script>

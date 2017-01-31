@@ -1,16 +1,14 @@
 <?php
 
-include "../conexao.php";
+include "../sisti/conexao.php";
 
 ?>
 
-<a href="./" id="botaoVoltar">Voltar</a>
-
 <section class="aparelho">
-	<h2>Adicionar Movimentos</h2>
+	<h1>Adicionar Modem</h1>
 
 	<form id="editarAparelho" action="./" method="post">
-	<input type="hidden" name="hiddenNovoMovimentos" value="true">
+	<input type="hidden" name="hiddenNovoModem" value="true">
 
 	<input placeholder="Operadora" type="text" name="inputOperadora" id="inputOperadora" required><span>*</span>
 	<input placeholder="IMEI" type="text" name="inputImei" id="inputImei" required><span>*</span>
@@ -24,11 +22,11 @@ include "../conexao.php";
 		<option value="0" selected>Sem Chip</option>
 		<?php
 		$sqlChip = "SELECT * FROM relatorios_chips ORDER BY id";
-		$resChip = mysql_query($sqlChip, $con);
-		$numChip = mysql_num_rows($resChip);
+		$resChip = sqlsrv_query($con, $sqlChip);
+		$numChip = sqlsrv_num_rows($resChip);
 
 		for($x = 0; $x < $numChip; $x++) {
-			$rowChip = mysql_fetch_array($resChip);
+			$rowChip = sqlsrv_fetch_array($resChip);
 		?>		
 		<option value="<?=$rowChip['id']?>"><?="Chip ".$rowChip['id']." - ".$rowChip['numero']?></option>
 		<?php } ?>

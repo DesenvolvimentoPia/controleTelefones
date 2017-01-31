@@ -1,4 +1,6 @@
-<h2>Lista de Modens</h2>
+<div id="dinamicoModens" ng-app="appModens" ng-controller="myCtrlModens">
+
+<h1>Lista de Modens</h1>
 
 	<input placeholder="Pesquisa Rápida" name="pesquisarModens" id="pesquisarModens" type="text" ng-model="filtroModen"><a id="adicionarModem">Adicionar</a>
 
@@ -32,12 +34,16 @@
 
 	<?php
 
-	$sql = "SELECT * FROM relatorios_modens ORDER BY id DESC";
-	$res = mysql_query($sql, $con);
-	$num = mysql_num_rows($res);
+	if($_POST) include "../../sisti/conexao.php";
 
-	for($i = 0; $i < $num; $i++) {
-	$row = mysql_fetch_array($res);
+	$sql = "SELECT * FROM relatorios_modens ORDER BY id DESC";
+	$res = sqlsrv_query($con, $sql);
+	$num = sqlsrv_num_rows($res);
+
+	$i = -1;
+	while($row = sqlsrv_fetch_array($res)) {
+	$i++;
+	
 		if($i == 0) echo "{";
 		else echo ", {";
 		echo "'id': ".$row['id'].", 'operadora': '".$row['operadora']."', 'situacao': '".$row['situacao']."', 'usuario': '".$row['usuario']."', 'imei': '".$row['imei']."', 'setor': '".$row['setor']."', 'unidade': '".$row['unidade']."', 'id_chip': '".$row['id_chip']."' }";
@@ -70,17 +76,19 @@ $(function () {
 
 	$('#adicionarModem').click(function() {
 
-		//$('#modens').html('Carregando...');
+		$("#modens").html('<div class="spinner nofloat"><div class="rect1"></div><div class="rect2"></div><div class="rect3"></div><div class="rect4"></div><div class="rect5"></div></div>');
 		// Do an ajax request
 		$.ajax({
 		  url: "modem.php?id=novo"
 		}).done(function(data) { // data what is sent back by the php page
-		  $('#modens').html(data); // display data
+		  setTimeout( function() { $('#modens').html(data); }, 340); // display data
 		});
 
 	});
 });
 
-angular.bootstrap('#modens', ['appModens']);
+angular.bootstrap('#dinamicoModens', ['appModens']);
 	
 </script>
+
+</div>

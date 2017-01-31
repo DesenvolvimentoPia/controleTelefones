@@ -1,19 +1,22 @@
 <?php
 
-include "../conexao.php";
+include "../sisti/conexao.php";
 
 ?>
 
-<a href="./" id="botaoVoltar">Voltar</a>
-
 <section class="aparelho">
-	<h2>Adicionar Chip</h2>
+	<h1>Adicionar Chip</h1>
 
 	<form id="editarAparelho" action="./" method="post">
 	<input type="hidden" name="hiddenNovoChip" value="true">
 
 	<input placeholder="Número" type="text" name="inputNumero" id="inputNumero" required><span>*</span>
-	<input placeholder="Situação" type="text" name="inputSituacao" id="inputSituacao" required><span>*</span>
+	<select placeholder="Situação" name="inputSituacao" id="inputSituacao" required>
+		<option value="" selected disabled>Situação</option>
+		<option value="Entregue">Entregue</option>
+		<option value="Estoque">Estoque</option>
+		<option value="Manutenção">Manutenção</option>
+	</select><span>*</span>
 
 	<input type="hidden" name="inputNormal" id="inputNormal">
 	<input type="hidden" name="inputMicro" id="inputMicro">
@@ -25,11 +28,10 @@ include "../conexao.php";
 		<option value="0" selected>Sem Linha</option>
 		<?php
 		$sqlChip = "SELECT * FROM relatorios_linhas ORDER BY id";
-		$resChip = mysql_query($sqlChip, $con);
-		$numChip = mysql_num_rows($resChip);
+		$resChip = sqlsrv_query($con, $sqlChip);
+		$numChip = sqlsrv_num_rows($resChip);
 
-		for($x = 0; $x < $numChip; $x++) {
-			$rowChip = mysql_fetch_array($resChip);
+		while($rowChip = sqlsrv_fetch_array($resChip)){
 		?>		
 		<option value="<?=$rowChip['id']?>"><?=$rowChip['numero']?></option>
 		<?php } ?>
@@ -55,6 +57,11 @@ include "../conexao.php";
 	});
 
 	</script>
+
+
+	<input value="Vivo" placeholder="Operadora" type="text" name="inputOperadora" id="inputOperadora">
+	<input placeholder="E-mail Administrativo" type="text" name="inputEmail" id="inputEmail">
+	<input placeholder="Senha" type="text" name="inputSenha" id="inputSenha">
 
 	<input type="submit" name="enviar" >
 

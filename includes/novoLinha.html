@@ -2,17 +2,29 @@
 
 ?>
 
-<a href="./" id="botaoVoltar">Voltar</a>
-
 <section class="aparelho">
-	<h2>Adicionar Linha</h2>
+	<h1>Adicionar Linha</h1>
 
 	<form id="editarAparelho" action="./" method="post">
 	<input type="hidden" name="hiddenNovoLinha" value="true">
 
 	<input placeholder="Número" type="text" name="inputNumero" id="inputNumero" required><span>*</span>
-	<input placeholder="Situação" type="text" name="inputSituacao" id="inputSituacao" required><span>*</span>
+	
+	<select placeholder="Situação" name="inputSituacao" id="inputSituacao" required>
+		<option value="" selected disabled>Situação</option>
+		<option value="Entregue">Entregue</option>
+		<option value="Estoque">Estoque</option>
+		<option value="Manutenção">Manutenção</option>
+	</select><span>*</span>
+	
 	<input placeholder="Status" type="text" name="inputStatus" id="inputStatus">
+
+	<input placeholder="Cota de Internet (em MB)" type="text" name="inputCota" id="inputCota">
+
+	<input type="hidden" name="inputMatriculaUsuario" id="inputMatriculaUsuario" required>
+	<input onkeyup="checkPesquisa()" onblur="fechaDinamico()" autocomplete="off" placeholder="Usuário" type="text" name="inputUsuario" id="inputUsuario">
+	
+	<div id="resultadoAjax"></div>
 
 	<input type="submit" name="enviar" >
 
@@ -20,3 +32,38 @@
 </section>
 
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<script type="text/javascript">
+
+var botaoPesquisa;
+
+function checkPesquisa() {
+	if(botaoPesquisa != document.getElementById("inputUsuario").value.toLowerCase()) {
+	    botaoPesquisa = document.getElementById("inputUsuario").value.toLowerCase();
+
+		if(botaoPesquisa.length > 3) {
+	        //alert("AQUI");
+	        
+	        $("#resultadoAjax").fadeIn();
+	        $("#resultadoAjax").html('<div class="spinner"><div class="rect1"></div><div class="rect2"></div><div class="rect3"></div><div class="rect4"></div><div class="rect5"></div></div>');
+
+	                // Faz requisição ajax e envia o ID da Categoria via método POST
+	            $.post("private/usuarios.php", {usu: botaoPesquisa}, function(resposta) {
+
+	               // Coloca a resposta na DIV
+	               setTimeout(function() { $("#resultadoAjax").html(resposta); }, 700);
+	           
+	            });
+
+	    }
+
+	    if(botaoPesquisa.length <= 3) $("#resultadoAjax").fadeOut();
+	}
+}
+
+function fechaDinamico() {
+	$("#resultadoAjax").fadeOut();	
+	setTimeout(function() { if (document.getElementById('inputMatriculaUsuario').value == '') document.getElementById('inputUsuario').value = ''; }, 350);
+}
+
+</script>

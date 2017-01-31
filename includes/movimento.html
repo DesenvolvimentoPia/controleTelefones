@@ -2,34 +2,118 @@
 
 // Arquivo de Corpo
 
-include "../conexao.php";
+include "../sisti/conexao.php";
 
 $sqlAparelho = "SELECT * FROM relatorios_movimentos WHERE id=".$_GET['id'];
-$resAparelho = mysql_query($sqlAparelho, $con);
-$rowAparelho = mysql_fetch_array($resAparelho);
+$resAparelho = sqlsrv_query($con, $sqlAparelho);
+$rowAparelho = sqlsrv_fetch_array($resAparelho);
 
 ?>
 
-<a href="./" id="botaoVoltar">Voltar</a>
-
 
 <section class="aparelho">
-	<h2>Editar Movimento - <?=$rowAparelho['id']?></h2>
+	<h1>Visualizar Movimento - <?=$rowAparelho['id']?></h1>
 
-	<form id="editarAparelho" action="./" method="post">
-	<input type="hidden" name="hiddenMovimento" value="<?=$rowAparelho['id']?>">
+	<div class="separador">
+	<p class="visualizar metade">Tipo do Item
+	<span><?=$rowAparelho['tipo_item']?></span>
+	</p>
 
-	<input value="<?=$rowAparelho['operadora']?>" placeholder="Operadora" type="text" name="inputOperadora" id="inputOperadora" required><span>*</span>
-	<input value="<?=$rowAparelho['imei']?>" placeholder="IMEI" type="text" name="inputImei" id="inputImei" required><span>*</span>
-	<input value="<?=$rowAparelho['situacao']?>" placeholder="Situação" type="text" name="inputSituacao" id="inputSituacao" required><span>*</span>
-	<input value="<?=$rowAparelho['usuario']?>" placeholder="Usuário" type="text" name="inputUsuario" id="inputUsuario">
-	<input value="<?=$rowAparelho['matricula']?>" placeholder="Matrícula" type="text" name="inputMatriculaUsuario" id="inputMatriculaUsuario">
-	<input value="<?=$rowAparelho['setor']?>" placeholder="Setor" type="text" name="inputSetor" id="inputSetor">
-	<input value="<?=$rowAparelho['unidade']?>" placeholder="Unidade" type="text" name="inputUnidade" id="inputUnidade">
+	<p class="visualizar metade">ID do Item
+	<span><?=$rowAparelho['id_item']?></span>
+	</p>
+	</div>
 
-	<input type="submit" name="enviar" value="Salvar">
+	<div class="separador">
+	<p class="visualizar metade">Data do Movimento
+	<span><?=$rowAparelho['data']->format('d/m/Y')?></span>
+	</p>
 
-	</form>
+	<p class="visualizar metade">Direção do Movimento
+	<span><?=$rowAparelho['direcao']?></span>
+	</p>
+	</div>
+
+	<p class="visualizar">Situação
+	<span><?=$rowAparelho['situacao']?></span>
+	</p>
+
+	<p class="visualizar">Responsável
+	<span><?=$rowAparelho['matricula']?> - <?=$rowAparelho['usuario']?></span>
+	</p>
+
+	<p class="visualizar">Descrição Complementar
+	<span><?php if(empty($rowAparelho['descricao'])) echo "Nenhum Comentário"; else echo $rowAparelho['descricao']; ?></span>
+	</p>
+
+	<?php if(!empty($rowAparelho['foto'])) { ?>
+	<p class="anexos">Foto do Equipamento
+	<a target="_blank" href="<?=$rowAparelho['foto'];?>"><img src="<?=$rowAparelho['foto'];?>" class="anexoMovimento"></a>
+	</p>
+	<?php } ?>
+
+
+	<?php if(!empty($rowAparelho['termo'])) { ?>
+	<p class="anexos">
+	<a target="_blank" href="<?=$rowAparelho['termo'];?>" class="anexoMovimento">Ver Termo</a>
+	</p>
+	<?php } ?>
+
+	<a class="excluir">Ocultar Movimento</a>
+
 </section>
 
+<div id="certeza">Tem certeza que deseja Ocultar o Movimento <?=$rowAparelho['id']?>?
+<small>Um item Oculto só pode ser restaurado pelo Administrador do Sistema.</small>
 
+<a id="btNao">Não</a>
+<a id="btSim">Sim</a>
+
+</div>
+
+<div id="sombraBranca"></div>
+
+<script>
+
+$(function () {
+	$('.excluir').click(function() {
+		$('#certeza').fadeIn();
+		$('#sombraBranca').fadeIn();
+	});
+
+	$('#sombraBranca').click(function() {
+		$('#certeza').fadeOut();
+		$('#sombraBranca').fadeOut();
+	});
+
+	$('#btNao').click(function() {
+		$('#certeza').fadeOut();
+		$('#sombraBranca').fadeOut();
+	});
+
+
+
+	$('#btSim').click(function() {
+
+	    var id = <?=$rowAparelho['id']?>;
+		$('#certeza').fadeOut();
+		$('#sombraBranca').fadeOut();
+
+		$("#movimentos").html('<div class="spinner nofloat"><div class="rect1"></div><div class="rect2"></div><div class="rect3"></div><div class="rect4"></div><div class="rect5"></div></div>');
+
+
+		$.ajax({
+		  url: "excluir.php?id="+id
+		}).done(function(data) { 
+			var ultimo = "";
+			$.post("./sections/movimentos.php", {ultimo: ultimo}, function(resposta) {
+		       // Coloca a resposta na DIV
+		       setTimeout(function() { $('#movimentos').html(resposta); }, 340);
+		   
+		    });
+		});
+	});
+
+});
+
+</script>
