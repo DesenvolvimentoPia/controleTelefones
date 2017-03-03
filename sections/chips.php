@@ -40,7 +40,7 @@
 	b.nomeUsuario,
 	a.operadora FROM relatorios_chips a
 	LEFT JOIN relatorios_linhas b ON 
-	a.id_linha LIKE b.numero WHERE a.operadora NOT LIKE 'Claro' ORDER BY a.id DESC";
+	a.id_linha LIKE b.numero /*WHERE a.operadora NOT LIKE 'Claro' */ ORDER BY a.id DESC";
 	$res = sqlsrv_query($con, $sql);
 
 	//echo $sql;
